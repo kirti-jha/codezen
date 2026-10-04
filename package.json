@@ -10,7 +10,7 @@
     "backend:start": "npm --prefix backend run start",
     "backend:db:generate": "npm --prefix backend run db:generate",
     "backend:db:push": "npm --prefix backend run db:push",
-    "postinstall": "npm run backend:db:generate",
+    "postinstall": "npm install --prefix backend && npm run backend:db:generate",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
