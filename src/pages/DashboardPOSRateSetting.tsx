@@ -454,7 +454,6 @@ export function NonAdminPOSRateSetting({ rates, isRetailer }: { rates: any[], is
                   </Select>
                 </div>
               </div>
-              </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-transparent border-b border-border/50">
