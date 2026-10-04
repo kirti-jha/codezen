@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? "/api" : "http://localhost:4000/api");
 export const TOKEN_KEY = "genpay_access_token";
 const USER_KEY = "genpay_user";
 const IMPERSONATED_AS_KEY = "impersonated_as";
