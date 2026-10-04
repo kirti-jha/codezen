@@ -396,6 +396,7 @@ export default function DashboardReports() {
             </Card>
           ))}
         </div>
+      )}
 
       {/* REPORT PREVIEW MODAL (When clicking "See Report" on cards) */}
       <Dialog open={!!viewingReport && !viewingLoading && !queryType} onOpenChange={(open) => !open && setViewingReport(null)}>
