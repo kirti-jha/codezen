@@ -23,6 +23,10 @@ import staffRoutes from "./routes/staff";
 import publicServiceInfoRoutes from "./routes/publicServiceInfo";
 import publicContactRoutes from "./routes/publicContact";
 import dbRoutes from "./routes/db";
+import settlementRoutes from "./routes/settlements";
+import limitRoutes from "./routes/limits";
+import systemLogsRoutes from "./routes/systemLogs";
+import posRoutes from "./routes/pos";
 
 export const prisma = new PrismaClient();
 
@@ -37,17 +41,7 @@ const staticAllowedOrigins = [
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-
-      const isStaticAllowed = staticAllowedOrigins.includes(origin);
-      const isLocalhost =
-        /^http:\/\/localhost:\d+$/.test(origin) ||
-        /^http:\/\/127\.0\.0\.1:\d+$/.test(origin);
-
-      if (isStaticAllowed || isLocalhost) return callback(null, true);
-      return callback(new Error("Not allowed by CORS"));
-    },
+    origin: true,
     credentials: true,
   })
 );
@@ -77,11 +71,15 @@ app.use("/api/tpin", tpinRoutes);
 app.use("/api/files", filesRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/db", dbRoutes);
+app.use("/api/settlements", settlementRoutes);
+app.use("/api/limits", limitRoutes);
+app.use("/api/system-logs", systemLogsRoutes);
+app.use("/api/pos", posRoutes);
 app.use("/api/public", publicServiceInfoRoutes);
 app.use("/api/public", publicContactRoutes);
 
 app.listen(PORT, () => {
-  console.log(`✅ AbheePay backend running on http://localhost:${PORT}`);
+  console.log(`✅ GenPay backend running on http://localhost:${PORT}`);
 });
 
 export default app;

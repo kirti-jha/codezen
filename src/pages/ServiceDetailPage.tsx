@@ -33,7 +33,7 @@ export default function ServiceDetailPage() {
     return <Navigate to="/services" replace />;
   }
 
-  usePageTitle(`AbheePay | ${svc.title}`);
+  usePageTitle(`GenPay | ${svc.title}`);
 
   const next = safeNextParam(svc.dashboardPath);
 

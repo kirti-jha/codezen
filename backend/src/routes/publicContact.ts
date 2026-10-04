@@ -49,7 +49,7 @@ router.post("/contact", async (req, res) => {
   if (mobile.length > 20) return res.status(400).json({ error: "Mobile is too long" });
   if (message.length > 4000) return res.status(400).json({ error: "Message is too long" });
 
-  const to = process.env.CONTACT_TO_EMAIL || "sales@abheepay.com";
+  const to = process.env.CONTACT_TO_EMAIL || "sales@genpay.com";
   const from = process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
   const resendKey = process.env.RESEND_API_KEY;
 

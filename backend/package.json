@@ -1,7 +1,7 @@
 {
-  "name": "abhee-flow-backend",
+  "name": "genpay-backend",
   "version": "1.0.0",
-  "description": "AbheePay Express backend with Prisma + Neon PostgreSQL",
+  "description": "GenPay Express backend with Prisma + Neon PostgreSQL",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

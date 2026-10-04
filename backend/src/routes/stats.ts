@@ -60,7 +60,7 @@ router.get("/admin", requireAuth, async (req: AuthRequest, res) => {
 
     const topWallets = [...wallets]
       .sort((a, b) => Number(b.balance || 0) - Number(a.balance || 0))
-      .slice(0, 5);
+      .slice(0, 10);
 
     const topUsersProfiles = await prisma.profile.findMany({
       where: { userId: { in: topWallets.map((w) => w.userId) } },
@@ -87,6 +87,43 @@ router.get("/admin", requireAuth, async (req: AuthRequest, res) => {
     const totalTxn = await prisma.transaction.count();
     const successRate = totalTxn > 0 ? (successCount / totalTxn) * 100 : 0;
 
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const [recentTxns, recentComms] = await Promise.all([
+      prisma.transaction.findMany({
+        where: { createdAt: { gte: sevenDaysAgo } },
+        select: { createdAt: true, amount: true },
+      }),
+      prisma.commissionLog.findMany({
+        where: { createdAt: { gte: sevenDaysAgo } },
+        select: { createdAt: true, commissionAmount: true },
+      })
+    ]);
+
+    const revenueMap = new Map();
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(sevenDaysAgo);
+      d.setDate(d.getDate() + i);
+      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      revenueMap.set(dateStr, { date: dateStr, volume: 0, commission: 0 });
+    }
+
+    recentTxns.forEach(t => {
+      const dateStr = new Date(t.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      if (revenueMap.has(dateStr)) {
+        revenueMap.get(dateStr).volume += Number(t.amount || 0);
+      }
+    });
+
+    recentComms.forEach(c => {
+      const dateStr = new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      if (revenueMap.has(dateStr)) {
+        revenueMap.get(dateStr).commission += Number(c.commissionAmount || 0);
+      }
+    });
+
     res.json({
       platformBalance: Number(walletAgg._sum.balance || 0),
       todaysVolume: Number(volumeToday._sum.amount || 0),
@@ -109,6 +146,7 @@ router.get("/admin", requireAuth, async (req: AuthRequest, res) => {
               ).toFixed(2)
             )
           : 0,
+      revenueData: Array.from(revenueMap.values()),
     });
   } catch (e: any) {
     res.status(500).json({ error: e.message });

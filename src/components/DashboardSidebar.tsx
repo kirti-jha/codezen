@@ -5,8 +5,8 @@ import {
   Shield, Zap, ChevronLeft, Fingerprint, Send, Receipt, CreditCard, BarChart3,
   FileText, Smartphone, Banknote, Building2, CreditCard as CreditCardIcon,
   Plane, Package, ShieldCheck, Landmark, Radio, Box, QrCode, FileSpreadsheet,
-  Settings2, ChevronDown, UserCog, User, KeyRound, Lock, Award, Download,
-  MessageCircle,
+  Settings2, ChevronDown, UserCog, User, KeyRound, Lock, Award, SlidersHorizontal,
+  MessageCircle, Activity,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/services/api";
@@ -22,7 +22,7 @@ interface NavItem {
   allowedRoles?: AppRole[];
   section?: string;
   serviceKey?: string;
-  permissionKey?: string; // staff permission required
+  permissionKey?: string;
   masterOnly?: boolean;
 }
 
@@ -36,6 +36,7 @@ const ICON_MAP: Record<string, typeof LayoutDashboard> = {
   payout: ArrowLeftRight, matm: Radio, bank_account: Building2, pan: FileText,
   ppi_wallet: Wallet, travel_booking: Plane, travel_package: Package,
   insurance: ShieldCheck, pg: QrCode, pos: Landmark, sound_box: Box,
+  qr: QrCode, upi_qr: QrCode,
 };
 
 const staticItems: NavItem[] = [
@@ -48,22 +49,94 @@ const staticItems: NavItem[] = [
 
 const managementItems: NavItem[] = [
   { label: "Staff Mgmt", icon: UserCog, path: "/dashboard/staff-management", allowedRoles: ["admin"], section: "Management", masterOnly: true },
-  { label: "Commissions", icon: BarChart3, path: "/dashboard/commissions", minRole: "distributor", section: "Management", permissionKey: "can_manage_commissions" },
+  { label: "Set Limits", icon: SlidersHorizontal, path: "/dashboard/set-limit", minRole: "distributor", section: "Management" },
+  { label: "Commissions", icon: BarChart3, path: "/dashboard/commissions", allowedRoles: ["admin"], section: "Management", permissionKey: "can_manage_commissions" },
   { label: "KYC", icon: FileText, path: "/dashboard/kyc", minRole: "distributor", section: "Management" },
-  { label: "Reports", icon: FileSpreadsheet, path: "/dashboard/reports", section: "Management", permissionKey: "can_view_reports" },
   { label: "Service Mgmt", icon: Settings2, path: "/dashboard/service-management", allowedRoles: ["admin"], section: "Management", permissionKey: "can_manage_services" },
   { label: "Security", icon: Shield, path: "/dashboard/security", allowedRoles: ["admin"], section: "Management", permissionKey: "can_manage_security" },
+  { label: "System Logs", icon: Activity, path: "/dashboard/system-logs", allowedRoles: ["admin"], section: "Management" },
   { label: "Settings", icon: Settings, path: "/dashboard/settings", allowedRoles: ["admin"], section: "Management", permissionKey: "can_manage_settings" },
 ];
 
 const userSettingsItems: NavItem[] = [
-  { label: "Commission Plan", icon: BarChart3, path: "/dashboard/commission-plan", section: "Setting", allowedRoles: ["super_distributor", "master_distributor", "distributor", "retailer"] },
+  { label: "Charges", icon: BarChart3, path: "/dashboard/commission-plan", section: "Setting", allowedRoles: ["super_distributor", "master_distributor", "distributor", "retailer"] },
   { label: "Profile", icon: User, path: "/dashboard/profile", section: "Setting", allowedRoles: ["super_distributor", "master_distributor", "distributor", "retailer"] },
   { label: "TPIN", icon: KeyRound, path: "/dashboard/tpin", section: "Setting", allowedRoles: ["super_distributor", "master_distributor", "distributor", "retailer"] },
   { label: "Change Password", icon: Lock, path: "/dashboard/change-password", section: "Setting", allowedRoles: ["super_distributor", "master_distributor", "distributor", "retailer"] },
   { label: "Certificate Download", icon: Award, path: "/dashboard/certificate", section: "Setting", allowedRoles: ["super_distributor", "master_distributor", "distributor", "retailer"] },
-  { label: "Device Driver", icon: Download, path: "/dashboard/device-driver", section: "Setting", allowedRoles: ["super_distributor", "master_distributor", "distributor", "retailer"] },
 ];
+
+interface ServiceSubItem {
+  label: string;
+  path: string;
+  icon: typeof LayoutDashboard;
+}
+
+function getServiceSubItems(serviceKey: string, serviceLabel: string, baseRoute: string, role: string | null): ServiceSubItem[] {
+  const Icon = ICON_MAP[serviceKey] || Zap;
+  const isRetailer = role === "retailer";
+  let items: ServiceSubItem[] = [];
+
+  if (serviceKey === "pos") {
+    items = [
+      { label: "POS Inventory", path: baseRoute, icon: Package },
+      { label: "POS Report", path: "/dashboard/reports?type=service_pos", icon: BarChart3 },
+      { label: "POS Ledger", path: "/dashboard/reports?type=wallet_ledger", icon: FileSpreadsheet },
+      { label: "POS Settlement", path: "/dashboard/settlements", icon: Landmark },
+      { label: "POS Rate Setting", path: "/dashboard/pos-rates", icon: SlidersHorizontal },
+    ];
+  } else if (serviceKey === "aeps") {
+    items = [
+      { label: "AEPS Terminal", path: baseRoute, icon: Icon },
+      { label: "AEPS Cash Withdrawal", path: `${baseRoute}?action=withdrawal`, icon: Banknote },
+      { label: "AEPS Report", path: "/dashboard/reports?type=service_aeps", icon: BarChart3 },
+      { label: "AEPS Ledger", path: "/dashboard/reports?type=wallet_ledger", icon: FileSpreadsheet },
+      { label: "AEPS Rate Setting", path: "/dashboard/commissions", icon: SlidersHorizontal },
+    ];
+  } else if (serviceKey === "bbps") {
+    items = [
+      { label: "BBPS Pay", path: baseRoute, icon: Icon },
+      { label: "BBPS Report", path: "/dashboard/reports?type=service_bbps", icon: BarChart3 },
+      { label: "BBPS Ledger", path: "/dashboard/reports?type=wallet_ledger", icon: FileSpreadsheet },
+      { label: "BBPS Rate Setting", path: "/dashboard/commissions", icon: SlidersHorizontal },
+    ];
+  } else if (serviceKey === "payout") {
+    items = [
+      { label: "Payout Portal", path: baseRoute, icon: Icon },
+      { label: "Payout Report", path: "/dashboard/reports?type=service_payout", icon: BarChart3 },
+      { label: "Payout Ledger", path: "/dashboard/reports?type=wallet_ledger", icon: FileSpreadsheet },
+      { label: "Payout Rate Setting", path: "/dashboard/commissions", icon: SlidersHorizontal },
+    ];
+  } else if (serviceKey === "recharge") {
+    items = [
+      { label: "Recharge Portal", path: baseRoute, icon: Icon },
+      { label: "Recharge Report", path: "/dashboard/reports?type=service_recharge", icon: BarChart3 },
+      { label: "Recharge Ledger", path: "/dashboard/reports?type=wallet_ledger", icon: FileSpreadsheet },
+      { label: "Recharge Rate Setting", path: "/dashboard/commissions", icon: SlidersHorizontal },
+    ];
+  } else if (serviceKey === "qr" || serviceKey === "upi_qr") {
+    items = [
+      { label: "QR Portal", path: baseRoute, icon: Icon },
+      { label: "QR Report", path: `/dashboard/reports?type=service_${serviceKey}`, icon: BarChart3 },
+      { label: "QR Ledger", path: "/dashboard/reports?type=wallet_ledger", icon: FileSpreadsheet },
+      { label: "QR Rate Setting", path: "/dashboard/commissions", icon: SlidersHorizontal },
+    ];
+  } else {
+    items = [
+      { label: serviceLabel, path: baseRoute, icon: Icon },
+      { label: `${serviceLabel} Report`, path: `/dashboard/reports?type=service_${serviceKey}`, icon: BarChart3 },
+      { label: `${serviceLabel} Ledger`, path: "/dashboard/reports?type=wallet_ledger", icon: FileSpreadsheet },
+      { label: `${serviceLabel} Rate Setting`, path: "/dashboard/commissions", icon: SlidersHorizontal },
+    ];
+  }
+
+  // Downline charges are configured in /dashboard/commission-plan.
+  if (role !== "admin") {
+    items = items.filter(item => !item.label.includes("Rate Setting"));
+  }
+
+  return items;
+}
 
 interface Props {
   onNavigate?: () => void;
@@ -75,10 +148,11 @@ export default function DashboardSidebar({ onNavigate }: Props) {
   const { user, role, isMasterAdmin, permissions } = useAuth();
 
   const [serviceItems, setServiceItems] = useState<NavItem[]>([]);
-  const [servicesOpen, setServicesOpen] = useState(false);
+  const [openServiceSections, setOpenServiceSections] = useState<Record<string, boolean>>({});
+  const [reportsOpen, setReportsOpen] = useState(false);
 
-  const isRetailer = role === "retailer";
   const isAdmin = role === "admin";
+  const canViewReports = isAdmin ? (isMasterAdmin || (permissions as any).can_view_reports) : true;
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -94,26 +168,36 @@ export default function DashboardSidebar({ onNavigate }: Props) {
             section: "Services",
           }));
           setServiceItems(items);
+
+          // By default open enabled service sections so sub-items are immediately visible
+          const openState: Record<string, boolean> = {};
+          items.forEach((item: any) => {
+            openState[item.serviceKey] = true;
+          });
+
+          setOpenServiceSections((prev) => ({ ...openState, ...prev }));
         }
       } catch (err) {
         console.error("Error fetching services for sidebar:", err);
       }
     };
+
     fetchServices();
+    window.addEventListener("genpay_services_updated", fetchServices);
+    return () => {
+      window.removeEventListener("genpay_services_updated", fetchServices);
+    };
   }, [user]);
 
-  useEffect(() => {
-    if (serviceItems.some((s) => location.pathname === s.path)) setServicesOpen(true);
-  }, [location.pathname, serviceItems]);
+  const toggleServiceSection = (key: string) => {
+    setOpenServiceSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const nonServiceItems = [...staticItems, ...managementItems, ...userSettingsItems].filter((item) => {
     if (!role) return false;
-    // Master-only items
     if (item.masterOnly && !isMasterAdmin) return false;
-    // Role check
     if (item.allowedRoles && !item.allowedRoles.includes(role)) return false;
     if (item.minRole && ROLE_LEVEL[role] > ROLE_LEVEL[item.minRole]) return false;
-    // Staff permission check (only for admin non-master)
     if (isAdmin && !isMasterAdmin && item.permissionKey) {
       if (!(permissions as any)[item.permissionKey]) return false;
     }
@@ -129,8 +213,6 @@ export default function DashboardSidebar({ onNavigate }: Props) {
     }
     sections[sections.length - 1].items.push(item);
   }
-
-  const showServicesDropdown = isRetailer && serviceItems.length > 0;
 
   const renderNavLink = (item: NavItem) => {
     const isActive = location.pathname === item.path;
@@ -151,11 +233,9 @@ export default function DashboardSidebar({ onNavigate }: Props) {
   return (
     <aside className={cn("h-screen sticky top-0 flex flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300", collapsed ? "w-[68px]" : "w-[250px]")}>
       <div className="flex items-center gap-2 px-4 h-16 border-b border-sidebar-border shrink-0">
-        <img
-          src="https://pos.abheepay.com/assets/FORMAT-PNG-Lj3U1uY2.png"
-          alt="ABHEEPAY"
-          className={cn("h-10 w-auto transition-all", collapsed ? "mx-auto" : "")}
-        />
+        <span className={cn("font-extrabold text-xl tracking-wider text-primary transition-all", collapsed ? "mx-auto" : "")}>
+          {collapsed ? "GP" : "GenPay"}
+        </span>
       </div>
 
       <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-1">
@@ -166,68 +246,166 @@ export default function DashboardSidebar({ onNavigate }: Props) {
             )}
             {collapsed && section.name !== "Main" && <div className="mx-3 my-2 border-t border-sidebar-border" />}
 
-            {/* For Main section: render Overview first, then Services dropdown, then rest */}
-            {section.name === "Main" && showServicesDropdown ? (
+            {section.items.map((item) => renderNavLink(item))}
+
+            {/* Inject Enabled Dynamic Service Sections & Reports Dropdown RIGHT AFTER Main */}
+            {section.name === "Main" && (
               <>
-                {/* Overview link first */}
-                {section.items.filter(i => i.path === "/dashboard").map(item => renderNavLink(item))}
+                {/* 1. Dynamic Enabled Services Sections (e.g. POS, AEPS, BBPS, Payout, etc.) */}
+                {serviceItems.map((svc) => {
+                  const subItems = getServiceSubItems(svc.serviceKey || "", svc.label, svc.path, role);
+                  const isOpen = openServiceSections[svc.serviceKey || ""] !== false;
+                  const SvcIcon = svc.icon;
 
-                {/* Services dropdown */}
-                <div className="mt-1">
-                  {!collapsed && <div className="px-3 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">Services</div>}
-                  {collapsed && <div className="mx-3 my-2 border-t border-sidebar-border" />}
-                  <button onClick={() => setServicesOpen(!servicesOpen)}
-                    className={cn("flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all w-full",
-                      servicesOpen ? "bg-sidebar-accent/30 text-sidebar-primary" : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                    )}
-                    title={collapsed ? "Services" : undefined}
-                  >
-                    <Box className="w-4.5 h-4.5 shrink-0" />
-                    {!collapsed && (
-                      <><span className="truncate flex-1 text-left">Services</span><ChevronDown className={cn("w-4 h-4 shrink-0 transition-transform", servicesOpen && "rotate-180")} /></>
-                    )}
-                  </button>
-                  {servicesOpen && !collapsed && (
-                    <div className="ml-3 pl-3 border-l border-sidebar-border/50 space-y-0.5 mt-0.5">
-                      {serviceItems.map((item) => {
-                        const isActive = location.pathname === item.path;
-                        return (
-                          <Link key={item.path} to={item.path} onClick={onNavigate}
-                            className={cn("flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
-                              isActive ? "bg-sidebar-accent text-sidebar-primary" : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                            )}>
-                            <item.icon className="w-3.5 h-3.5 shrink-0" /><span className="truncate">{item.label}</span>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-                  {servicesOpen && collapsed && (
-                    <div className="space-y-0.5 mt-0.5">
-                      {serviceItems.map((item) => {
-                        const isActive = location.pathname === item.path;
-                        return (
-                          <Link key={item.path} to={item.path} onClick={onNavigate}
-                            className={cn("flex items-center justify-center px-3 py-2 rounded-lg transition-all",
-                              isActive ? "bg-sidebar-accent text-sidebar-primary" : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-                            )}
-                            title={item.label}>
-                            <item.icon className="w-4 h-4 shrink-0" />
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                  return (
+                    <div key={svc.serviceKey} className="mb-2">
+                      {!collapsed && (
+                        <div className="px-3 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-widest text-primary/80 flex items-center justify-between">
+                          <span>{svc.label} Section</span>
+                        </div>
+                      )}
+                      {collapsed && <div className="mx-3 my-2 border-t border-sidebar-border" />}
 
-                {/* Remaining Main items (excluding Overview) */}
-                {section.items.filter(i => i.path !== "/dashboard").map(item => renderNavLink(item))}
+                      <button
+                        onClick={() => toggleServiceSection(svc.serviceKey || "")}
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all w-full mt-1",
+                          isOpen ? "bg-sidebar-accent/30 text-sidebar-primary" : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                        )}
+                        title={collapsed ? svc.label : undefined}
+                      >
+                        <SvcIcon className="w-4.5 h-4.5 shrink-0 text-primary" />
+                        {!collapsed && (
+                          <>
+                            <span className="truncate flex-1 text-left font-bold">{svc.label}</span>
+                            <ChevronDown className={cn("w-4 h-4 shrink-0 transition-transform", isOpen && "rotate-180")} />
+                          </>
+                        )}
+                      </button>
+
+                      {isOpen && !collapsed && (
+                        <div className="ml-3 pl-3 border-l border-sidebar-border/50 space-y-0.5 mt-0.5">
+                          {subItems.map((sub) => {
+                            const currentUrl = location.pathname + location.search;
+                            const isActive = currentUrl === sub.path || (sub.path.includes("?") && currentUrl === sub.path);
+                            return (
+                              <Link
+                                key={sub.path + sub.label}
+                                to={sub.path}
+                                onClick={onNavigate}
+                                className={cn(
+                                  "flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                                  isActive ? "bg-sidebar-accent text-sidebar-primary font-bold" : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                                )}
+                              >
+                                <sub.icon className="w-3.5 h-3.5 shrink-0" />
+                                <span className="truncate">{sub.label}</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {isOpen && collapsed && (
+                        <div className="space-y-0.5 mt-0.5">
+                          {subItems.map((sub) => {
+                            const currentUrl = location.pathname + location.search;
+                            const isActive = currentUrl === sub.path;
+                            return (
+                              <Link
+                                key={sub.path + sub.label}
+                                to={sub.path}
+                                onClick={onNavigate}
+                                className={cn(
+                                  "flex items-center justify-center px-3 py-2 rounded-lg transition-all",
+                                  isActive ? "bg-sidebar-accent text-sidebar-primary" : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                                )}
+                                title={sub.label}
+                              >
+                                <sub.icon className="w-4 h-4 shrink-0" />
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {/* 2. Reports Dropdown */}
+                {canViewReports && (
+                  <div className="mb-2">
+                    {!collapsed && <div className="px-3 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">Overall Reports</div>}
+                    {collapsed && <div className="mx-3 my-2 border-t border-sidebar-border" />}
+                    <button onClick={() => setReportsOpen(!reportsOpen)}
+                      className={cn("flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all w-full mt-1",
+                        reportsOpen ? "bg-sidebar-accent/30 text-sidebar-primary" : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                      )}
+                      title={collapsed ? "Overall Reports" : undefined}
+                    >
+                      <FileSpreadsheet className="w-4.5 h-4.5 shrink-0" />
+                      {!collapsed && (
+                        <><span className="truncate flex-1 text-left font-bold">Overall Reports</span><ChevronDown className={cn("w-4 h-4 shrink-0 transition-transform", reportsOpen && "rotate-180")} /></>
+                      )}
+                    </button>
+                    {reportsOpen && !collapsed && (
+                      <div className="ml-3 pl-3 border-l border-sidebar-border/50 space-y-0.5 mt-0.5">
+                        {[
+                          { label: "Wallet Ledger", path: "/dashboard/reports?type=wallet_ledger", icon: Wallet },
+                          { label: "Fund Requests", path: "/dashboard/reports?type=fund_requests", icon: Banknote },
+                          { label: "Commission Report", path: "/dashboard/reports?type=commissions", icon: BarChart3 },
+                          { label: "KYC Report", path: "/dashboard/reports?type=kyc", icon: FileText },
+                          ...serviceItems.map(s => ({
+                            label: `${s.label} Report`,
+                            path: `/dashboard/reports?type=service_${s.serviceKey}`,
+                            icon: s.icon
+                          }))
+                        ].map((item) => {
+                          const isActive = location.pathname + location.search === item.path;
+                          return (
+                            <Link key={item.path} to={item.path} onClick={onNavigate}
+                              className={cn("flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                                isActive ? "bg-sidebar-accent text-sidebar-primary" : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                              )}>
+                              <item.icon className="w-3.5 h-3.5 shrink-0" /><span className="truncate">{item.label}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {reportsOpen && collapsed && (
+                      <div className="space-y-0.5 mt-0.5">
+                        {[
+                          { label: "Wallet Ledger", path: "/dashboard/reports?type=wallet_ledger", icon: Wallet },
+                          { label: "Fund Requests", path: "/dashboard/reports?type=fund_requests", icon: Banknote },
+                          { label: "Commission Report", path: "/dashboard/reports?type=commissions", icon: BarChart3 },
+                          { label: "KYC Report", path: "/dashboard/reports?type=kyc", icon: FileText },
+                          ...serviceItems.map(s => ({
+                            label: `${s.label} Report`,
+                            path: `/dashboard/reports?type=service_${s.serviceKey}`,
+                            icon: s.icon
+                          }))
+                        ].map((item) => {
+                          const isActive = location.pathname + location.search === item.path;
+                          return (
+                            <Link key={item.path} to={item.path} onClick={onNavigate}
+                              className={cn("flex items-center justify-center px-3 py-2 rounded-lg transition-all",
+                                isActive ? "bg-sidebar-accent text-sidebar-primary" : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                              )}
+                              title={item.label}>
+                              <item.icon className="w-4 h-4 shrink-0" />
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </>
-            ) : (
-              section.items.map((item) => renderNavLink(item))
             )}
           </div>
         ))}
+
         {/* Support link at bottom */}
         <div className="mt-auto pt-2">
           {!collapsed && (

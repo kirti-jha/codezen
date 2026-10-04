@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Wallet, ArrowUpRight, ArrowDownRight, Plus, Clock,
   CheckCircle2, Send, ArrowDownLeft, RefreshCw, CreditCard, Download, Lock, Building2,
+  Check, ChevronsUpDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,9 +13,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { useToast } from "@/hooks/use-toast";
 import { downloadCSV } from "@/lib/csv-export";
 import { apiFetch } from "@/services/api";
+import { TPinDialog } from "@/components/TPinDialog";
+import { cn } from "@/lib/utils";
 type AppRole = "admin" | "super_distributor" | "master_distributor" | "distributor" | "retailer";
 
 const ROLE_LABELS: Record<AppRole, string> = {
@@ -84,6 +89,8 @@ export default function DashboardWallet() {
   const [transferTarget, setTransferTarget] = useState("");
   const [transferAmount, setTransferAmount] = useState("");
   const [transferDesc, setTransferDesc] = useState("");
+  const [tpinOpen, setTpinOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // PG form
   const [pgAmount, setPgAmount] = useState("");
@@ -184,13 +191,15 @@ export default function DashboardWallet() {
     }
   };
 
-  const handleTransfer = async () => {
-    console.log(`[Wallet UI] Transfer click. Target: ${transferTarget}, Amount: ${transferAmount}`);
+  const handleTransferClick = () => {
     if (!transferTarget || !transferAmount || parseFloat(transferAmount) <= 0) {
-      console.warn(`[Wallet UI] Validation failed for transfer`);
       toast({ title: "Invalid input", description: "Select user and enter a valid amount.", variant: "destructive" });
       return;
     }
+    setTpinOpen(true);
+  };
+
+  const processTransfer = async () => {
     setProcessing(true);
     try {
       console.log(`[Wallet UI] Calling POST /wallet/transfer to user ${transferTarget}`);
@@ -538,16 +547,52 @@ export default function DashboardWallet() {
             </div>
             <div className="space-y-2">
               <Label>Send To</Label>
-              <Select value={transferTarget} onValueChange={setTransferTarget}>
-                <SelectTrigger><SelectValue placeholder="Choose downline user" /></SelectTrigger>
-                <SelectContent>
-                  {downlineUsers.map((u) => (
-                    <SelectItem key={u.user_id} value={u.user_id}>
-                      {u.full_name} ({ROLE_LABELS[u.role]})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={searchOpen} onOpenChange={setSearchOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={searchOpen}
+                    className="w-full justify-between font-normal"
+                  >
+                    {transferTarget
+                      ? (() => {
+                          const u = downlineUsers.find((u) => u.user_id === transferTarget);
+                          return u ? `${u.full_name} (${ROLE_LABELS[u.role as AppRole]})` : "Select user...";
+                        })()
+                      : "Search downline user..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[400px] p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search by name, ID or phone..." />
+                    <CommandList>
+                      <CommandEmpty>No user found.</CommandEmpty>
+                      <CommandGroup>
+                        {downlineUsers.map((u) => (
+                          <CommandItem
+                            key={u.user_id}
+                            value={`${u.full_name} ${u.user_id} ${u.phone || ""}`}
+                            onSelect={() => {
+                              setTransferTarget(u.user_id);
+                              setSearchOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                transferTarget === u.user_id ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {u.full_name} <span className="text-muted-foreground ml-2 text-xs">({ROLE_LABELS[u.role as AppRole]})</span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <Label>Amount (₹)</Label>
@@ -559,13 +604,22 @@ export default function DashboardWallet() {
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setTransferOpen(false)}>Cancel</Button>
-              <Button onClick={handleTransfer} disabled={processing}>
-                <Send className="w-4 h-4 mr-1.5" /> {processing ? "Processing..." : "Transfer"}
+              <Button onClick={handleTransferClick} disabled={processing}>
+                <Send className="w-4 h-4 mr-1.5" /> Continue
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* TPIN Dialog for Transfer */}
+      <TPinDialog
+        open={tpinOpen}
+        onOpenChange={setTpinOpen}
+        title="Confirm Wallet Transfer"
+        description={`Transferring ₹${parseFloat(transferAmount || "0").toLocaleString("en-IN")} to selected user.`}
+        onSuccess={processTransfer}
+      />
 
       {/* PG Add Fund Dialog */}
       <Dialog open={pgOpen} onOpenChange={setPgOpen}>

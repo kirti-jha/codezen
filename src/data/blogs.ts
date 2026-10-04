@@ -20,193 +20,166 @@ export type BlogPost = {
 
 export const BLOG_POSTS: BlogPost[] = [
   {
-    "id": "how-the-right-insurance-plan-builds-long-term-financial-security",
-    "img": "https://fintekdiary.com/wp-content/uploads/2022/11/close-up-hand-putting-money-coins-stack-saving-money-growing-business-concept-1300x731-1.jpg",
-    "tag": "INSURANCE",
-    "title": "How the Right Insurance Plan Builds Long-Term Financial Security",
-    "author": "Abheepay Team",
-    "date": "2025",
-    "time": "3 min read",
-    "comments": 2,
-    "content": [
-      "Insurance plays a vital role in protecting individuals from financial uncertainty.",
-      "Health, life, and general insurance plans provide a safety net during emergencies.",
-      "Digital insurance services have simplified policy selection, renewal, and claim processes."
+    id: "unlocking-dual-wallet-settlement-speeds",
+    img: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?q=80&w=1000&auto=format&fit=crop",
+    tag: "SETTLEMENTS",
+    title: "Unlocking Dual-Wallet T0 & T1 Settlement Speeds for Retailers",
+    author: "GenPay Product Team",
+    date: "Oct 2026",
+    time: "4 min read",
+    comments: 5,
+    content: [
+      "In modern retail banking, liquidity is cash flow fuel. Traditional settlement delays of 24-48 hours often freeze merchant working capital.",
+      "GenPay's innovative Dual-Wallet Architecture introduces real-time T0 Same-Day instant payouts alongside T1 Next-Day Auto-Settlements.",
+      "Retailers can now request instant transfers to their bank accounts or manage downline limit allocations seamlessly with automated cutoff windows."
     ],
-    "whyChoose": [
-      "Quick policy comparison",
-      "Paperless documentation",
-      "Trusted insurance providers",
-      "Simple claim assistance"
+    whyChoose: [
+      "Instant T0 main wallet transfers",
+      "Automated T1 next-day settlements at 10:00 AM",
+      "Dynamic upline-downline pool management",
+      "Zero hidden payout processing fees"
     ],
-    "highlights": [
-      { "title": "Risk Protection", "desc": "Financial safety during emergencies." },
-      { "title": "Digital Access", "desc": "Easy online policy management." },
-      { "title": "Future Ready", "desc": "Long-term family security." }
+    highlights: [
+      { title: "Real-time Payouts", desc: "Instant fund access anytime, anywhere." },
+      { title: "Liquidity Control", desc: "Balance T0 daily limits with T1 auto-settlements." },
+      { title: "Audit Trail", desc: "Transparent audit logs for every settlement action." }
     ],
-    "related": [1, 2]
+    related: [1, 2]
   },
   {
-    "id": "why-digital-credit-card-bill-payments-are-safer-than-cash",
-    "img": "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80\u0026w=1000\u0026auto=format\u0026fit=crop",
-    "tag": "PAYMENTS",
-    "title": "Why Digital Credit Card Bill Payments are Safer Than Cash",
-    "author": "Abheepay Team",
-    "date": "2025",
-    "time": "2 min read",
-    "comments": 1,
-    "content": [
-      "Digital bill payments reduce the risk of missed deadlines and penalties.",
-      "Instant confirmation and secure gateways make transactions reliable.",
-      "Retailers and customers both benefit from transparent payment records."
+    id: "how-aeps-and-micro-atms-transform-rural-banking",
+    img: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1000&auto=format&fit=crop",
+    tag: "DIGITAL BANKING",
+    title: "How AEPS & Micro ATMs are Revolutionizing Rural Banking Access",
+    author: "GenPay Field Operations",
+    date: "Sep 2026",
+    time: "3 min read",
+    comments: 8,
+    content: [
+      "Aadhaar Enabled Payment System (AEPS) has brought essential banking services directly to rural doorsteps through neighborhood kirana stores.",
+      "Using biometrics and Micro-ATM devices, customers can withdraw cash, check balances, and transfer funds without traveling miles to bank branches.",
+      "GenPay's high-speed AEPS gateway boasts a 99.8% transaction success rate with instant commission credits for retail partners."
     ],
-    "whyChoose": [
-      "Real-time transaction updates",
-      "Highly secure payment gateways",
-      "Zero paperwork",
-      "24/7 payment availability"
+    whyChoose: [
+      "Biometric finger-scan authentication",
+      "High commission per cash withdrawal",
+      "Instant wallet settlement for retailers",
+      "Supports all major Indian public & private banks"
     ],
-    "highlights": [
-      { "title": "Security", "desc": "Encrypted digital transactions." },
-      { "title": "Speed", "desc": "Instant payment confirmation." },
-      { "title": "Convenience", "desc": "Pay anytime, anywhere." }
+    highlights: [
+      { title: "Inclusion", desc: "Financial services for Tier-3 and rural users." },
+      { title: "High Earnings", desc: "Consistent retail commission per transaction." },
+      { title: "Biometric Safety", desc: "Secure Aadhaar-backed transactions." }
     ],
-    "related": [0, 3]
+    related: [0, 3]
   },
   {
-    "id": "digital-banking-solutions-empowering-small-businesses",
-    "img": "https://fintekdiary.com/wp-content/uploads/2023/01/working-computer-graphing-cryptocurrenciesfinance-background-1300x731-1.jpg",
-    "tag": "DIGITAL BANKING",
-    "title": "Digital Banking Solutions Empowering Small Businesses",
-    "author": "Abheepay Team",
-    "date": "2025",
-    "time": "4 min read",
-    "comments": 3,
-    "content": [
-      "Digital banking has transformed how small businesses manage money.",
-      "Services like fund transfers, balance tracking, and transaction history are now instant.",
-      "This shift enables businesses to save time and improve cash flow management."
+    id: "maximizing-commission-income-with-bbps-bill-payments",
+    img: "https://images.unsplash.com/photo-1556742400-b5b7c5121f44?q=80&w=1000&auto=format&fit=crop",
+    tag: "BBPS",
+    title: "Maximizing Commission Income with BBPS Utility Bill Payments",
+    author: "GenPay Growth Desk",
+    date: "Aug 2026",
+    time: "3 min read",
+    comments: 4,
+    content: [
+      "Bharat Bill Payment System (BBPS) provides an integrated, interoperable bill payment service for electricity, water, gas, FASTag, and mobile recharges.",
+      "Retailers serving as BBPS payment points experience high daily footfall and repeat customer visits.",
+      "With GenPay's unified BBPS interface, agents receive real-time bill fetch, instant receipt generation, and attractive slab commissions."
     ],
-    "whyChoose": [
-      "Fast fund transfers",
-      "Better record keeping",
-      "Improved cash flow",
-      "Secure digital banking access"
+    whyChoose: [
+      "Instant fetch for 200+ utility billers nationwide",
+      "Automated bill payment receipt via SMS & print",
+      "High multi-tier distributor commission split",
+      "24x7 automated dispute resolution"
     ],
-    "highlights": [
-      { "title": "Efficiency", "desc": "Quick and easy money management." },
-      { "title": "Transparency", "desc": "Clear transaction history." },
-      { "title": "Growth", "desc": "Supports better cash flow decisions." }
+    highlights: [
+      { title: "Footfall Booster", desc: "Attract regular monthly footfall to your shop." },
+      { title: "Universal Billers", desc: "Pay electricity, gas, DTH, water & broadband." },
+      { title: "Reliability", desc: "Instant BBPS transaction reference number." }
     ],
-    "related": [1, 4]
+    related: [1, 4]
   },
   {
-    "id": "smart-cash-flow-management-for-growing-retailers",
-    "img": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80\u0026w=1000\u0026auto=format\u0026fit=crop",
-    "tag": "BUSINESS",
-    "title": "Smart Cash Flow Management for Growing Retailers",
-    "author": "Abheepay Team",
-    "date": "2025",
-    "time": "3 min read",
-    "comments": 4,
-    "content": [
-      "Retailers can grow faster when cash flow is managed efficiently.",
-      "Tracking daily inflow and outflow helps avoid sudden shortages.",
-      "Digital tools make record keeping easier and reduce manual errors."
+    id: "automated-kyc-verification-speeding-up-onboarding",
+    img: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=1000&auto=format&fit=crop",
+    tag: "COMPLIANCE",
+    title: "Automated KYC Verification: Fast-Tracking Onboarding Security",
+    author: "GenPay Security Lab",
+    date: "Jul 2026",
+    time: "5 min read",
+    comments: 3,
+    content: [
+      "Manual document verification can delay agent onboarding by days, hindering network expansion for Master Distributors and Super Franchises.",
+      "GenPay's automated KYC engine leverages OCR technology, real-time Aadhaar OTP verification, and instant PAN verification.",
+      "Partners can onboard new downline retailers in less than 2 minutes while maintaining full RBI compliance and audit trails."
     ],
-    "whyChoose": [
-      "Track daily income",
-      "Manage expenses better",
-      "Avoid cash crunch",
-      "Improve profitability"
+    whyChoose: [
+      "Sub-minute automated document verification",
+      "Real-time NSDL PAN & UIDAI Aadhaar verification",
+      "Encrypted document storage with RBAC controls",
+      "Instant agent activation upon approval"
     ],
-    "highlights": [
-      { "title": "Planning", "desc": "Better financial decision making." },
-      { "title": "Control", "desc": "Track and optimize spending." },
-      { "title": "Stability", "desc": "Reduced risk of shortages." }
+    highlights: [
+      { title: "Speed", desc: "Onboard agents in under 2 minutes." },
+      { title: "Accuracy", desc: "Automated OCR extraction reduces errors." },
+      { title: "Compliance", desc: "Full RBI compliant audit logs." }
     ],
-    "related": [2, 5]
+    related: [2, 5]
   },
   {
-    "id": "utility-bill-payments-a-convenient-digital-experience",
-    "img": "https://images.unsplash.com/photo-1556742400-b5b7c5121f44?q=80\u0026w=1000\u0026auto=format\u0026fit=crop",
-    "tag": "BBPS",
-    "title": "Utility Bill Payments: A Convenient Digital Experience",
-    "author": "Abheepay Team",
-    "date": "2024",
-    "time": "2 min read",
-    "comments": 2,
-    "content": [
-      "Utility bill payments are now quick and hassle-free with digital platforms.",
-      "Customers can pay electricity, gas, water, and other bills instantly.",
-      "Retailers offering bill payment services can increase footfall and customer trust."
+    id: "smart-daily-limit-controls-for-franchise-networks",
+    img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1000&auto=format&fit=crop",
+    tag: "MANAGEMENT",
+    title: "Smart Daily Limit Controls for Franchise Networks",
+    author: "GenPay Risk Management",
+    date: "Jun 2026",
+    time: "4 min read",
+    comments: 6,
+    content: [
+      "Managing financial risk across extensive distributor networks requires intelligent transaction limits and per-transaction caps.",
+      "GenPay's Set Limit system allows admins and uplines to configure custom daily limits, per-transaction caps, or toggle free-will unlimited overrides.",
+      "Live limit utilization tracking prevents over-exposure while allowing high-performing retailers room to grow."
     ],
-    "whyChoose": [
-      "Instant bill payments",
-      "Multiple utility coverage",
-      "Secure and reliable",
-      "Higher customer satisfaction"
+    whyChoose: [
+      "Per-user custom daily & transaction caps",
+      "Global & individual unlimited overrides",
+      "Bulk CSV limit updates for fast network management",
+      "Real-time usage tracking & alert notifications"
     ],
-    "highlights": [
-      { "title": "Convenience", "desc": "Pay bills in minutes." },
-      { "title": "Coverage", "desc": "Multiple utilities supported." },
-      { "title": "Trust", "desc": "Secure BBPS powered payments." }
+    highlights: [
+      { title: "Risk Mitigation", desc: "Protect distribution networks from over-exposure." },
+      { title: "Flexibility", desc: "Toggle unlimited mode for trusted partners." },
+      { title: "CSV Bulk Ops", desc: "Update hundreds of retailer limits in one click." }
     ],
-    "related": [4, 7]
+    related: [0, 3]
   },
   {
-    "id": "how-digital-loan-services-help-businesses-scale-faster",
-    "img": "https://fintekdiary.com/wp-content/uploads/2022/11/focused-indian-young-couple-accounting-calculating-bills-discussing-planning-budget-together-using-online-banking-services-calculator-checking-finances-1300x731-1.jpg",
-    "tag": "LOANS",
-    "title": "How Digital Loan Services Help Businesses Scale Faster",
-    "author": "Abheepay Team",
-    "date": "2024",
-    "time": "3 min read",
-    "comments": 5,
-    "content": [
-      "Digital loan services offer quick access to working capital.",
-      "Minimal documentation and faster approvals reduce business downtime.",
-      "These services empower entrepreneurs to expand without financial stress."
+    id: "the-future-of-api-driven-payouts-for-msmes",
+    img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1000&auto=format&fit=crop",
+    tag: "PAYOUTS",
+    title: "The Future of API-Driven Payouts for MSMEs and FinTechs",
+    author: "GenPay Engineering",
+    date: "May 2026",
+    time: "4 min read",
+    comments: 2,
+    content: [
+      "Bulk payouts to vendor accounts, employee salaries, and customer refunds are moving from tedious manual banking portals to developer-friendly APIs.",
+      "GenPay's API Payout Suite allows businesses to trigger IMPS, NEFT, RTGS, and UPI payouts programmatically with sub-second callbacks.",
+      "With built-in webhooks and dual-wallet balance fallbacks, businesses ensure seamless operations around the clock."
     ],
-    "whyChoose": [
-      "Quick loan approval",
-      "Minimal documentation",
-      "Flexible repayment options",
-      "Transparent process"
+    whyChoose: [
+      "RESTful API integration with sandbox environment",
+      "Support for IMPS, NEFT, RTGS, and UPI handles",
+      "Instant webhook callbacks for payout status",
+      "24/7 processing with bank channel routing"
     ],
-    "highlights": [
-      { "title": "Speed", "desc": "Faster access to funds." },
-      { "title": "Flexibility", "desc": "Business-friendly repayment plans." },
-      { "title": "Growth", "desc": "Support for expansion plans." }
+    highlights: [
+      { title: "Automation", desc: "Automate thousands of daily vendor payouts." },
+      { title: "Reliability", desc: "Smart routing across multiple banking nodes." },
+      { title: "Developer First", desc: "SDKs & clear documentation for fast integration." }
     ],
-    "related": [5, 7]
-  },
-  {
-    "id": "how-digital-financial-services-increase-retail-store-footfall",
-    "img": "https://fintekdiary.com/wp-content/uploads/2023/02/real-estate-agent-working-table-1300x731-1.jpg",
-    "tag": "RETAIL SERVICES",
-    "title": "How Digital Financial Services Increase Retail Store Footfall",
-    "author": "Abheepay Team",
-    "date": "2024",
-    "time": "3 min read",
-    "comments": 6,
-    "content": [
-      "Retailers offering digital services attract more daily customers.",
-      "Services like bill payments, banking, and insurance build customer trust.",
-      "This results in increased income opportunities and stronger customer relationships."
-    ],
-    "whyChoose": [
-      "Multiple service offerings",
-      "Higher customer engagement",
-      "Additional income streams",
-      "Stronger brand trust"
-    ],
-    "highlights": [
-      { "title": "Footfall", "desc": "More customers daily." },
-      { "title": "Revenue", "desc": "Extra earning opportunities." },
-      { "title": "Trust", "desc": "Reliable digital services." }
-    ],
-    "related": [6, 0]
+    related: [4, 1]
   }
 ];
 
@@ -222,4 +195,3 @@ export function getRelatedBlogPosts(post: BlogPost) {
     .filter((i) => BLOG_POSTS[i]?.id !== post.id);
   return valid.map((i) => BLOG_POSTS[i]).filter(Boolean);
 }
-

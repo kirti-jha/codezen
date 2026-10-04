@@ -12,9 +12,9 @@ const stats = [
 ];
 
 const paymentLinks = [
-  { id: "PG01", name: "Shop Invoice #234", amount: 2500, link: "pay.abheepay.in/s/abc123", status: "active", collections: 3 },
-  { id: "PG02", name: "Monthly Subscription", amount: 999, link: "pay.abheepay.in/s/def456", status: "active", collections: 12 },
-  { id: "PG03", name: "Event Registration", amount: 500, link: "pay.abheepay.in/s/ghi789", status: "expired", collections: 45 },
+  { id: "PG01", name: "Shop Invoice #234", amount: 2500, link: "pay.genpay.in/s/abc123", status: "active", collections: 3 },
+  { id: "PG02", name: "Monthly Subscription", amount: 999, link: "pay.genpay.in/s/def456", status: "active", collections: 12 },
+  { id: "PG03", name: "Event Registration", amount: 500, link: "pay.genpay.in/s/ghi789", status: "expired", collections: 45 },
 ];
 
 const transactions = [

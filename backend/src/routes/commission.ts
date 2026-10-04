@@ -459,4 +459,35 @@ router.delete("/overrides/:id", requireAuth, async (req: AuthRequest, res) => {
   }
 });
 
+// GET /api/commission/my-plan — get user's active commission plan (slabs + overrides)
+router.get("/my-plan", requireAuth, async (req: AuthRequest, res) => {
+  try {
+    const userRole = await prisma.userRole.findFirst({ where: { userId: req.userId! } });
+    if (!userRole) return res.status(403).json({ error: "No role found for user" });
+
+    // Fetch active global slabs for the user's role
+    const globalSlabs = await prisma.commissionSlab.findMany({
+      where: { role: userRole.role, isActive: true },
+      orderBy: [{ serviceKey: "asc" }, { minAmount: "asc" }],
+    });
+
+    // Fetch user-specific overrides
+    const overrides = await prisma.userCommissionOverride.findMany({
+      where: { targetUserId: req.userId!, isActive: true },
+      orderBy: [{ serviceKey: "asc" }, { minAmount: "asc" }],
+    });
+
+    // Merge them: if an override exists for a service and range, it takes precedence.
+    // For simplicity in the UI, we'll return both and let the frontend merge or display them clearly, 
+    // or we can format them here. Let's return both arrays and the frontend can map it.
+    res.json({
+      role: userRole.role,
+      globalSlabs,
+      overrides
+    });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 export default router;

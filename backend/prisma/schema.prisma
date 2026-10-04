@@ -78,6 +78,7 @@ model Wallet {
   userId         String   @unique @map("user_id") @db.Uuid
   balance        Decimal  @default(0.00) @db.Decimal(15, 2)
   eWalletBalance Decimal  @default(0.00) @map("e_wallet_balance") @db.Decimal(15, 2)
+  t1Balance      Decimal  @default(0.00) @map("t1_balance") @db.Decimal(15, 2)
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
@@ -339,3 +340,147 @@ model Transaction {
 
   @@map("transactions")
 }
+
+model SettlementConfig {
+  id                    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  minSettlementAmount   Decimal  @default(100) @map("min_settlement_amount") @db.Decimal(15, 2)
+  maxSettlementAmount   Decimal  @default(500000) @map("max_settlement_amount") @db.Decimal(15, 2)
+  settlementFeeType     String   @default("flat") @map("settlement_fee_type")
+  settlementFeeValue    Decimal  @default(5) @map("settlement_fee_value") @db.Decimal(15, 2)
+  autoSettlementEnabled Boolean  @default(false) @map("auto_settlement_enabled")
+  settlementSchedule    String   @default("instant") @map("settlement_schedule")
+  posT0Settlement       Boolean  @default(true) @map("pos_t0_settlement")
+  userDailyLimit        Boolean  @default(true) @map("user_daily_limit")
+  t1CutoffTime          String   @default("10:00 AM") @map("t1_cutoff_time")
+  updatedBy             String?  @map("updated_by") @db.Uuid
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settlement_configs")
+}
+
+model UserSettlementSetting {
+  id                      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                  String   @unique @map("user_id") @db.Uuid
+  settlementType          String   @default("T0") @map("settlement_type")
+  t0DailyLimit            Decimal  @default(100000) @map("t0_daily_limit") @db.Decimal(15, 2)
+  t0TodayUsed             Decimal  @default(0) @map("t0_today_used") @db.Decimal(15, 2)
+  lastUsedDate            String?  @map("last_used_date")
+  allocatedDownlineLimit  Decimal  @default(0) @map("allocated_downline_limit") @db.Decimal(15, 2)
+  remainingSelfLimit      Decimal  @default(100000) @map("remaining_self_limit") @db.Decimal(15, 2)
+  isT0Enabled             Boolean  @default(true) @map("is_t0_enabled")
+  updatedBy               String?  @map("updated_by") @db.Uuid
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  @@map("user_settlement_settings")
+}
+
+model SettlementHold {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  amount      Decimal   @db.Decimal(15, 2)
+  reason      String
+  status      String    @default("active")
+  placedBy    String    @map("placed_by") @db.Uuid
+  releasedBy  String?   @map("released_by") @db.Uuid
+  releasedAt  DateTime? @map("released_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("settlement_holds")
+}
+
+model SettlementRequest {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String    @map("user_id") @db.Uuid
+  amount            Decimal   @db.Decimal(15, 2)
+  fee               Decimal   @default(0) @db.Decimal(15, 2)
+  netAmount         Decimal   @map("net_amount") @db.Decimal(15, 2)
+  settlementType    String    @default("manual") @map("settlement_type")
+  payoutMode        String    @default("bank_transfer") @map("payout_mode")
+  status            String    @default("pending")
+  bankName          String?   @map("bank_name")
+  bankAccountNumber String?   @map("bank_account_number")
+  bankIfsc          String?   @map("bank_ifsc")
+  bankAccountHolder String?   @map("bank_account_holder")
+  referenceId       String?   @map("reference_id")
+  failureReason     String?   @map("failure_reason")
+  remarks           String?
+  processedBy       String?   @map("processed_by") @db.Uuid
+  processedAt       DateTime? @map("processed_at")
+  walletTxnId       String?   @map("wallet_txn_id") @db.Uuid
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@map("settlement_requests")
+}
+
+model SettlementAuditLog {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  settlementId String?  @map("settlement_id") @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  actionBy     String   @map("action_by") @db.Uuid
+  action       String
+  details      String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("settlement_audit_logs")
+}
+
+model SystemLimitConfig {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  defaultDailyLimit   Decimal  @default(100000) @map("default_daily_limit") @db.Decimal(15, 2)
+  defaultPerTxnLimit Decimal  @default(25000) @map("default_per_txn_limit") @db.Decimal(15, 2)
+  globalUnlimited     Boolean  @default(false) @map("global_unlimited")
+  updatedBy           String?  @map("updated_by") @db.Uuid
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  @@map("system_limit_configs")
+}
+
+model UserLimit {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String   @unique @map("user_id") @db.Uuid
+  dailyLimit       Decimal? @map("daily_limit") @db.Decimal(15, 2)
+  perTxnLimit      Decimal? @map("per_txn_limit") @db.Decimal(15, 2)
+  isUnlimited      Boolean  @default(false) @map("is_unlimited")
+  todayUsedAmount  Decimal  @default(0) @map("today_used_amount") @db.Decimal(15, 2)
+  lastUsedDate     String?  @map("last_used_date")
+  updatedBy        String?  @map("updated_by") @db.Uuid
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("user_limits")
+}
+
+model LimitAuditLog {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  targetUserId         String   @map("target_user_id") @db.Uuid
+  actionBy             String   @map("action_by") @db.Uuid
+  action               String
+  previousDailyLimit   Decimal? @map("previous_daily_limit") @db.Decimal(15, 2)
+  newDailyLimit        Decimal? @map("new_daily_limit") @db.Decimal(15, 2)
+  previousPerTxnLimit  Decimal? @map("previous_per_txn_limit") @db.Decimal(15, 2)
+  newPerTxnLimit       Decimal? @map("new_per_txn_limit") @db.Decimal(15, 2)
+  details              String?
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  @@map("limit_audit_logs")
+}
+
+model SystemLog {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String?  @map("user_id") @db.Uuid
+  userEmail String?  @map("user_email")
+  userRole  String?  @map("user_role")
+  action    String
+  module    String   @default("SYSTEM")
+  severity  String   @default("info")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  details   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("system_activity_logs")
+}
+
+
+

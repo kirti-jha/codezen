@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import usePageTitle from "@/hooks/usePageTitle";
 
 export default function UnauthorizedPage() {
-  usePageTitle("AbheePay | Access Denied");
+  usePageTitle("GenPay | Access Denied");
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

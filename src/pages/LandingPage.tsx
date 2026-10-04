@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   Link2,
   Layers,
+  ChevronDown,
 } from "lucide-react";
 
 
@@ -35,7 +36,7 @@ const stats = [
 ];
 
 export default function LandingPage() {
-  usePageTitle("AbheePay | Home");
+  usePageTitle("GenPay | Home");
 
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
@@ -62,7 +63,7 @@ export default function LandingPage() {
           message: contactMessage,
         }),
       });
-      setContactSuccess("Thanks! Your query has been sent to sales@abheepay.com.");
+      setContactSuccess("Thanks! Your query has been sent to sales@genpay.com.");
       setContactName("");
       setContactEmail("");
       setContactMobile("");
@@ -77,24 +78,43 @@ export default function LandingPage() {
   return (
     <div id="top" className="min-h-screen bg-background">
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 glass">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-primary border-b border-primary/20 shadow-lg">
         <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <Link to="/" className="flex items-center">
-            <img
-              src="https://pos.abheepay.com/assets/FORMAT-PNG-Lj3U1uY2.png"
-              alt="ABHEEPAY"
-              className="h-12 w-auto"
-            />
+            <span className="font-extrabold text-2xl tracking-tight text-black">GenPay</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <a href="#stats" className="text-sm text-muted-foreground hover:text-foreground transition-colors">About Us</a>
-            <a href="#services" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Services</a>
-            <Link to="/blogs" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Blogs</Link>
-            <a href="#contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contact Us</a>
+            <a href="#stats" className="text-sm font-bold text-black hover:opacity-80 transition-opacity">About Us</a>
+            
+            {/* Services Mega Menu */}
+            <div className="group relative">
+              <button className="flex items-center gap-1 text-sm font-bold text-black hover:opacity-80 transition-opacity h-16">
+                Services <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
+              </button>
+              
+              <div className="absolute top-full left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <div className="w-[800px] max-h-[80vh] overflow-y-auto bg-card border border-border rounded-xl shadow-elevated p-6 grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {MARKETING_SERVICES.map((svc) => (
+                    <Link key={svc.key} to="/login" className="flex items-start gap-3 hover:bg-secondary/50 p-2 rounded-lg transition-colors group/item">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover/item:bg-primary group-hover/item:text-primary-foreground transition-colors">
+                        <svc.icon className="w-5 h-5 text-primary group-hover/item:text-white transition-colors" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-foreground group-hover/item:text-primary transition-colors">{svc.title}</div>
+                        <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{svc.description}</div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <Link to="/blogs" className="text-sm font-bold text-black hover:opacity-80 transition-opacity">Blogs</Link>
+            <a href="#contact" className="text-sm font-bold text-black hover:opacity-80 transition-opacity">Contact Us</a>
           </div>
           <div className="flex items-center gap-3">
             <Link to="/login">
-              <Button variant="hero-outline" size="sm">Login</Button>
+              <Button className="bg-black text-white hover:bg-black/80 font-bold" size="sm">Login</Button>
             </Link>
             <Button asChild variant="hero" size="sm">
               <a href="#contact">Get Started</a>
@@ -128,9 +148,9 @@ export default function LandingPage() {
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
-              <a href="#services">
+              <a href="#features">
                 <Button variant="hero-outline" size="lg" className="text-base px-8">
-                  Explore Services
+                  Explore Features
                 </Button>
               </a>
             </div>
@@ -143,43 +163,6 @@ export default function LandingPage() {
                 <div className="text-2xl sm:text-3xl font-heading font-bold text-gradient-primary">{s.value}</div>
                 <div className="text-sm text-muted-foreground mt-1">{s.label}</div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Services */}
-      <section id="services" className="py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">
-              Complete Suite of <span className="text-gradient-primary">Financial Services</span>
-            </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Everything your network needs to serve millions of customers across India.
-            </p>
-            <div className="mt-6">
-              <Link to="/services" className="inline-flex items-center text-sm font-medium text-primary hover:underline">
-                View all services <ChevronRight className="w-4 h-4 ml-1" />
-              </Link>
-            </div>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {MARKETING_SERVICES.map((svc) => (
-              <Link
-                key={svc.key}
-                to={`/services/${svc.key}`}
-                className="group p-6 rounded-xl bg-gradient-card border border-border hover:border-primary/40 transition-all duration-300 hover:shadow-glow"
-              >
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <svc.icon className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="text-lg font-heading font-semibold text-foreground mb-2">{svc.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{svc.description}</p>
-                <div className="mt-4 flex items-center text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  Learn more <ChevronRight className="w-4 h-4 ml-1" />
-                </div>
-              </Link>
             ))}
           </div>
         </div>
@@ -246,7 +229,7 @@ export default function LandingPage() {
                 Ready to Scale Your Business?
               </h2>
               <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-                Join thousands of distributors and retailers already using Abheepay to power their financial services network.
+                Join thousands of distributors and retailers already using GenPay to power their financial services network.
               </p>
               <Button asChild variant="hero" size="lg" className="text-base px-10">
                 <a href="#contact">
@@ -275,20 +258,20 @@ export default function LandingPage() {
             <div className="mt-10 grid gap-6 lg:grid-cols-2 items-start">
               <div className="rounded-2xl border border-border bg-gradient-card p-6 shadow-elevated">
                 <div className="text-sm text-muted-foreground">Call Us</div>
-                <a className="text-foreground font-medium mt-1 inline-block hover:underline" href="tel:+918860037218">
-                  +91 88600 37218
+                <a className="text-foreground font-medium mt-1 inline-block hover:underline font-mono" href="tel:+9118001234567">
+                  +91 1800 123 4567 (Toll-Free)
                 </a>
                 <div className="h-px bg-border my-5" />
                 <div className="text-sm text-muted-foreground">Email Us</div>
-                <a className="text-foreground font-medium mt-1 inline-block hover:underline" href="mailto:care@abheepay.in">
-                  care@abheepay.in
+                <a className="text-foreground font-medium mt-1 inline-block hover:underline font-mono" href="mailto:support@genpay.com">
+                  support@genpay.com
                 </a>
                 <div className="h-px bg-border my-5" />
                 <div className="text-sm text-muted-foreground">Visit Us</div>
                 <div className="text-foreground font-medium mt-1 leading-relaxed">
-                  2nd Floor, Plot No - 3, KH. NO. 33/6<br />
-                  AMBERHAI, SECTOR-19, DWARKA,<br />
-                  NEW DELHI - 110043
+                  GenPay Fintech Tower, Cyber City,<br />
+                  Phase 2, Sector 44, Gurugram,<br />
+                  Haryana - 122002
                 </div>
               </div>
 
@@ -328,7 +311,7 @@ export default function LandingPage() {
                     <Button type="submit" variant="hero" size="sm" disabled={contactSending}>
                       {contactSending ? "Sending..." : "Send"}
                     </Button>
-                    <div className="text-xs text-muted-foreground">Sent to sales@abheepay.com</div>
+                    <div className="text-xs text-muted-foreground">Sent to sales@genpay.com</div>
                   </div>
                   {contactError ? <div className="text-xs text-red-500">{contactError}</div> : null}
                   {contactSuccess ? <div className="text-xs text-emerald-600">{contactSuccess}</div> : null}
@@ -345,14 +328,10 @@ export default function LandingPage() {
           <div className="grid gap-10 lg:grid-cols-3 items-start">
             <div>
               <div className="flex items-center gap-3">
-                <img
-                  src="https://pos.abheepay.com/assets/FORMAT-PNG-Lj3U1uY2.png"
-                  alt="ABHEEPAY"
-                  className="h-12 w-auto"
-                />
+                <span className="font-extrabold text-2xl tracking-tight text-white">GenPay</span>
               </div>
               <p className="mt-5 text-sm text-slate-300 leading-relaxed max-w-sm">
-                AbheePay delivers secure fintech, payments, and digital financial solutions.
+                GenPay delivers secure fintech, payments, and digital financial solutions.
               </p>
               <Link to="/about" className="mt-4 inline-flex items-center text-sm font-medium text-teal-300 hover:text-teal-200">
                 Read more <ChevronRight className="w-4 h-4 ml-1" />
@@ -413,7 +392,7 @@ export default function LandingPage() {
 
         <div className="border-t border-slate-700/70">
           <div className="container mx-auto px-4 py-6 text-center text-sm text-slate-400">
-            (c) 2025 AbheePay. All rights reserved.
+            (c) 2025 GenPay. All rights reserved.
           </div>
         </div>
       </footer>

@@ -6,6 +6,7 @@ import fs from "fs";
 import path from "path";
 import { prisma } from "../index";
 import { requireAuth, AuthRequest } from "../middleware/auth";
+import { logSystemActivity } from "./systemLogs";
 
 const router = Router();
 
@@ -54,6 +55,15 @@ router.post("/login", async (req, res) => {
 
     if (!authUser || !authUser.isActive) {
       await appendLoginDebug(buildLoginDebugLine(req, "failed", "reason=invalid_credentials"));
+      await logSystemActivity({
+        userEmail: email,
+        action: "USER_LOGIN_FAILED",
+        module: "AUTH",
+        severity: "warning",
+        ipAddress: req.ip,
+        userAgent: req.headers["user-agent"],
+        details: `Failed login attempt for ${email} (User not found or inactive)`,
+      });
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
@@ -61,11 +71,35 @@ router.post("/login", async (req, res) => {
     await appendLoginDebug(buildLoginDebugLine(req, "password_check", `ok=${ok}`));
     if (!ok) {
       await appendLoginDebug(buildLoginDebugLine(req, "failed", "reason=invalid_credentials"));
+      await logSystemActivity({
+        userId: authUser.userId,
+        userEmail: email,
+        action: "USER_LOGIN_FAILED",
+        module: "AUTH",
+        severity: "warning",
+        ipAddress: req.ip,
+        userAgent: req.headers["user-agent"],
+        details: `Failed login attempt for ${email} (Incorrect password)`,
+      });
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const token = signBackendToken(authUser.userId);
     const profile = await prisma.profile.findUnique({ where: { userId: authUser.userId } });
+    const userRole = await prisma.userRole.findFirst({ where: { userId: authUser.userId } });
+
+    await logSystemActivity({
+      userId: authUser.userId,
+      userEmail: email,
+      userRole: userRole?.role,
+      action: "USER_LOGIN_SUCCESS",
+      module: "AUTH",
+      severity: "info",
+      ipAddress: req.ip,
+      userAgent: req.headers["user-agent"],
+      details: `User ${email} logged in successfully`,
+    });
+
     await appendLoginDebug(
       buildLoginDebugLine(req, "success", `userId=${authUser.userId} profile_found=${Boolean(profile)}`)
     );

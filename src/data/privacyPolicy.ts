@@ -11,11 +11,11 @@ export const PRIVACY_POLICY_SECTIONS: PrivacyPolicySection[] = [
     title: "Introduction & Acceptance",
     subtitle: "Who we are and what this policy covers",
     items: [
-      'Abheepay ("we", "us", "our") respects every individual\'s right to privacy and is committed to protecting their Personal Data and Sensitive Personal Data or Information.',
+      'GenPay ("we", "us", "our") respects every individual\'s right to privacy and is committed to protecting their Personal Data and Sensitive Personal Data or Information.',
       'This Privacy Policy ("Policy") applies to all visitors (who do not have an account) and users (who have registered accounts) (collectively "User") who access, browse, or use our website, applications, platforms, or services (collectively "Platform").',
       "This Policy explains how we collect, use, store, process, transfer, and disclose User data.",
       "By accessing or using our Platform, you acknowledge that you have read, understood, and agreed to this Policy. If you do not agree, please do not use our services.",
-      "This Policy forms part of Abheepay's Terms & Conditions. Continued use of our services after updates constitutes acceptance of the revised Policy.",
+      "This Policy forms part of GenPay's Terms & Conditions. Continued use of our services after updates constitutes acceptance of the revised Policy.",
       "We reserve the right to modify this Policy at any time. Material changes will be notified via registered email or other communication channels. Users are advised to review this Policy periodically.",
     ],
   },
@@ -209,7 +209,7 @@ export const PRIVACY_POLICY_GRIEVANCE = {
   heading: "Grievance Officer / Contact Us",
   intro:
     "For any privacy concerns, complaints, or requests related to this Privacy Policy, please contact us. Response Time: Within 30 days of receipt of request.",
-  email: "support@abheepay.com",
+  email: "support@genpay.com",
   phone: "8860037218",
   badges: ["256-bit Encryption", "Privacy Controls", "30-day Response", "Regular Audits"],
 };

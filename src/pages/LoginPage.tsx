@@ -7,11 +7,10 @@ import { Zap, Eye, EyeOff, LogIn, ArrowLeft, KeyRound, ShieldCheck, Mail, Loader
 import { useToast } from "@/hooks/use-toast";
 import { apiFetch, setAuthSession } from "@/services/api";
 import usePageTitle from "@/hooks/usePageTitle";
-
 type ForgotStep = "idle" | "identity" | "otp" | "new_password" | "done";
 
 export default function LoginPage() {
-  usePageTitle("AbheePay | Login");
+  usePageTitle("GenPay | Login");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -283,6 +282,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute top-4 right-4 z-50">
+      </div>
+
       {/* 1. Grid & Mesh Layer */}
       <div className="absolute inset-0 bg-grid opacity-20 pointer-events-none" />
       <div className="absolute inset-0 bg-mesh pointer-events-none" />
@@ -302,18 +304,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md relative z-10">
         {/* Logo & Header with entry animation */}
         <div className="text-center mb-10 animate-in fade-in slide-in-from-top-10 duration-1000">
-          <Link to="/" className="inline-flex items-center mb-6 animate-float">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-primary/30 blur-2xl group-hover:bg-primary/50 transition-all rounded-full" />
-              <img
-                src="https://pos.abheepay.com/assets/FORMAT-PNG-Lj3U1uY2.png"
-                alt="ABHEEPAY"
-                className="h-20 w-auto relative z-10 drop-shadow-[0_0_15px_rgba(187,85,53,0.5)]"
-              />
-            </div>
+          <Link to="/" className="inline-flex items-center mb-6">
+            <span className="font-black text-4xl tracking-tighter text-primary">GenPay</span>
           </Link>
           <h2 className="text-3xl font-heading font-black text-foreground tracking-tighter sm:text-4xl text-gradient-primary">
-            {forgotStep === "idle" ? "AbheePay" : "Reset Access"}
+            {forgotStep === "idle" ? "GenPay" : "Reset Access"}
           </h2>
           <p className="text-muted-foreground text-sm mt-3 font-medium tracking-wide uppercase opacity-80">
             {forgotStep === "idle" ? "Secure Partner Portal" : "Identity Verification"}
@@ -337,7 +332,7 @@ export default function LoginPage() {
                 </Label>
                 <div className="relative group">
                   <Input
-                    id="email" type="email" placeholder="partner@abheepay.com"
+                    id="email" type="email" placeholder="partner@genpay.com"
                     value={email} onChange={(e) => setEmail(e.target.value)}
                     required className="bg-white/[0.03] border-white/5 h-12 rounded-xl focus:bg-white/[0.07] focus:border-primary/50 transition-all duration-300 placeholder:opacity-30"
                   />
@@ -396,7 +391,7 @@ export default function LoginPage() {
             <div className="pt-6 border-t border-white/5 animate-in fade-in duration-1000 delay-400">
               <p className="text-center text-[10px] text-muted-foreground leading-relaxed font-medium uppercase tracking-widest opacity-40">
                 Restricted Access System<br />
-                © 2026 ABHEEPAY DIGITAL SOLUTIONS
+                © 2026 GENPAY DIGITAL SOLUTIONS
               </p>
             </div>
           </form>

@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { AUTH_SESSION_EVENT, apiFetch, clearAuthSession, getAuthToken, getStoredUser, type AppAuthUser } from "@/services/api";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
+import { AUTH_SESSION_EVENT, apiFetch, clearAuthSession, getAuthToken, getStoredUser, TOKEN_KEY, type AppAuthUser } from "@/services/api";
 import type { AppRole } from "@/types/auth";
 
 interface Profile {
@@ -129,7 +129,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [walletBalance, setWalletBalance] = useState(0);
   const [eWalletBalance, setEWalletBalance] = useState(0);
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
+    const token = getAuthToken();
+    const storedUser = getStoredUser();
+    if (token) setSession({ access_token: token });
+    if (storedUser) setUser(storedUser);
+
     try {
       const data = await apiFetch("/auth/me");
       if (data.user) setUser(data.user as AppAuthUser);
@@ -142,22 +147,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setEWalletBalance(data.eWalletBalance || 0);
       setRole((data.role || null) as AppRole | null);
       setPermissions(DEFAULT_PERMISSIONS);
-    } catch (err) {
-      clearAuthSession();
-      setSession(null);
-      setUser(null);
-      setProfile(null);
-      setRole(null);
-      setIsMasterAdmin(false);
-      setPermissions(DEFAULT_PERMISSIONS);
-      setWalletBalance(0);
-      setEWalletBalance(0);
+      return data;
+    } catch (err: any) {
+      const isAuthError =
+        err?.message?.includes("Unauthorized") ||
+        err?.message?.includes("Forbidden") ||
+        err?.message?.includes("token") ||
+        err?.message?.includes("jwt");
+
+      if (isAuthError) {
+        clearAuthSession();
+        setSession(null);
+        setUser(null);
+        setProfile(null);
+        setRole(null);
+        setIsMasterAdmin(false);
+        setPermissions(DEFAULT_PERMISSIONS);
+        setWalletBalance(0);
+        setEWalletBalance(0);
+      }
       throw err;
     }
-  };
+  }, []);
 
   useEffect(() => {
     const loadSession = () => {
+      // Prevent initial fetch with wrong token if we are on the impersonate page
+      const isImpersonating = window.location.pathname.startsWith('/impersonate');
+      if (isImpersonating && !sessionStorage.getItem(TOKEN_KEY)) {
+        setLoading(false);
+        return; // Let ImpersonatePage handle the session setup
+      }
+
       const token = getAuthToken();
       const storedUser = getStoredUser();
       if (!token || !storedUser) {
@@ -173,17 +194,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
+      setLoading(true);
       setSession({ access_token: token });
       setUser(storedUser);
-      fetchUserData().finally(() => setLoading(false));
+      fetchUserData()
+        .catch((err) => {
+          console.error("Failed to load user session data:", err);
+          clearAuthSession();
+          setSession(null);
+          setUser(null);
+          setProfile(null);
+          setRole(null);
+          setIsMasterAdmin(false);
+          setPermissions(DEFAULT_PERMISSIONS);
+          setWalletBalance(0);
+          setEWalletBalance(0);
+        })
+        .finally(() => setLoading(false));
     };
 
     window.addEventListener(AUTH_SESSION_EVENT, loadSession);
     loadSession();
     return () => window.removeEventListener(AUTH_SESSION_EVENT, loadSession);
-  }, []);
+  }, [fetchUserData]);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     clearAuthSession();
     setSession(null);
     setUser(null);
@@ -193,12 +228,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setPermissions(DEFAULT_PERMISSIONS);
     setWalletBalance(0);
     setEWalletBalance(0);
-  };
+    window.location.href = "/";
+  }, []);
 
-  const refreshProfile = async () => {
+  const refreshProfile = useCallback(async () => {
     if (!getAuthToken()) return;
     await fetchUserData();
-  };
+  }, [fetchUserData]);
 
   return (
     <AuthContext.Provider

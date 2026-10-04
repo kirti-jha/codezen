@@ -1,4 +1,4 @@
-console.log("%c🚀 [Frontend] AbheePay Application Loaded", "color: #00ff00; font-weight: bold; font-size: 16px;");
+console.log("%c🚀 [Frontend] GenPay Application Loaded", "color: #00ff00; font-weight: bold; font-size: 16px;");
 import { createRoot } from "react-dom/client";
 
 import App from "./App.tsx";

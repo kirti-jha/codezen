@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { setAuthSession } from "@/services/api";
+import { useAuth } from "@/contexts/AuthContext";
 import usePageTitle from "@/hooks/usePageTitle";
 
 export default function ImpersonatePage() {
-  usePageTitle("AbheePay | Impersonation");
+  usePageTitle("GenPay | Impersonation");
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { refreshProfile } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -26,8 +28,18 @@ export default function ImpersonatePage() {
 
     // Use sessionStorage so impersonation doesn't overwrite admin session in other tabs.
     setAuthSession(accessToken, { id: userId || "impersonated", email }, { scope: "session" });
-    navigate("/dashboard", { replace: true });
-  }, [searchParams, navigate]);
+
+    // Fetch user profile and role before navigating to dashboard
+    refreshProfile()
+      .then(() => {
+        navigate("/dashboard", { replace: true });
+      })
+      .catch((err: any) => {
+        console.error("Failed to load impersonated profile:", err);
+        // Even if refreshProfile fails, attempt navigating if session token exists
+        navigate("/dashboard", { replace: true });
+      });
+  }, [searchParams, navigate, refreshProfile]);
 
   if (error) {
     return (

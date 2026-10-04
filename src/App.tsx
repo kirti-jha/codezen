@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Suspense, lazy } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PageLoader from "@/components/PageLoader";
@@ -29,6 +30,9 @@ const DashboardUsers = lazy(() => import("./pages/DashboardUsers"));
 const DashboardWallet = lazy(() => import("./pages/DashboardWallet"));
 const DashboardFundRequests = lazy(() => import("./pages/DashboardFundRequests"));
 const DashboardTransactions = lazy(() => import("./pages/DashboardTransactions"));
+const DashboardSettlements = lazy(() => import("./pages/DashboardSettlements"));
+const DashboardSetLimit = lazy(() => import("./pages/DashboardSetLimit"));
+const DashboardSystemLogs = lazy(() => import("./pages/DashboardSystemLogs"));
 
 const DashboardAEPS = lazy(() => import("./pages/DashboardAEPS"));
 const DashboardRemittance = lazy(() => import("./pages/DashboardRemittance"));
@@ -48,6 +52,7 @@ const DashboardInsurance = lazy(() => import("./pages/DashboardInsurance"));
 const DashboardPG = lazy(() => import("./pages/DashboardPG"));
 const DashboardPOS = lazy(() => import("./pages/DashboardPOS"));
 const DashboardSoundBox = lazy(() => import("./pages/DashboardSoundBox"));
+const DashboardUPIQR = lazy(() => import("./pages/DashboardUPIQR"));
 
 const DashboardCommissions = lazy(() => import("./pages/DashboardCommissions"));
 const DashboardKYC = lazy(() => import("./pages/DashboardKYC"));
@@ -61,9 +66,9 @@ const DashboardProfile = lazy(() => import("./pages/DashboardProfile"));
 const DashboardTpin = lazy(() => import("./pages/DashboardTpin"));
 const DashboardChangePassword = lazy(() => import("./pages/DashboardChangePassword"));
 const DashboardCertificate = lazy(() => import("./pages/DashboardCertificate"));
-const DashboardDeviceDriver = lazy(() => import("./pages/DashboardDeviceDriver"));
 const DashboardCommissionPlan = lazy(() => import("./pages/DashboardCommissionPlan"));
 const DashboardSupport = lazy(() => import("./pages/DashboardSupport"));
+const DashboardPOSRateSetting = lazy(() => import("./pages/DashboardPOSRateSetting"));
 
 const queryClient = new QueryClient();
 
@@ -75,7 +80,8 @@ const suspense = (node: React.ReactNode, label?: string) => (
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+    <ThemeProvider defaultTheme="dark" storageKey="genpay-theme">
+      <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -107,6 +113,7 @@ const App = () => (
               <Route path="wallet" element={suspense(<DashboardWallet />, "Loading wallet...")} />
               <Route path="fund-requests" element={suspense(<DashboardFundRequests />, "Loading...")} />
               <Route path="transactions" element={suspense(<DashboardTransactions />, "Loading...")} />
+              <Route path="settlements" element={suspense(<DashboardSettlements />, "Loading settlements...")} />
               {/* Services */}
               <Route path="aeps" element={suspense(<DashboardAEPS />, "Loading...")} />
               <Route path="bbps" element={suspense(<DashboardBBPS />, "Loading...")} />
@@ -126,21 +133,24 @@ const App = () => (
               <Route path="pg" element={suspense(<DashboardPG />, "Loading...")} />
               <Route path="pos" element={suspense(<DashboardPOS />, "Loading...")} />
               <Route path="sound-box" element={suspense(<DashboardSoundBox />, "Loading...")} />
+              <Route path="upi-qr" element={suspense(<DashboardUPIQR />, "Loading...")} />
               {/* Management */}
               <Route path="commissions" element={<ProtectedRoute minRole="distributor">{suspense(<DashboardCommissions />, "Loading...")}</ProtectedRoute>} />
+              <Route path="set-limit" element={<ProtectedRoute minRole="distributor">{suspense(<DashboardSetLimit />, "Loading limits...")}</ProtectedRoute>} />
               <Route path="kyc" element={<ProtectedRoute minRole="distributor">{suspense(<DashboardKYC />, "Loading...")}</ProtectedRoute>} />
               <Route path="reports" element={suspense(<DashboardReports />, "Loading...")} />
               <Route path="staff-management" element={<ProtectedRoute allowedRoles={["admin"]}>{suspense(<DashboardStaffManagement />, "Loading...")}</ProtectedRoute>} />
               <Route path="service-management" element={<ProtectedRoute allowedRoles={["admin"]}>{suspense(<DashboardServiceManagement />, "Loading...")}</ProtectedRoute>} />
               <Route path="security" element={<ProtectedRoute allowedRoles={["admin"]}>{suspense(<DashboardSecurity />, "Loading...")}</ProtectedRoute>} />
+              <Route path="system-logs" element={<ProtectedRoute allowedRoles={["admin"]}>{suspense(<DashboardSystemLogs />, "Loading logs...")}</ProtectedRoute>} />
               <Route path="settings" element={<ProtectedRoute allowedRoles={["admin"]}>{suspense(<DashboardSettings />, "Loading...")}</ProtectedRoute>} />
+              <Route path="pos-rates" element={<ProtectedRoute allowedRoles={["admin"]}>{suspense(<DashboardPOSRateSetting />, "Loading...")}</ProtectedRoute>} />
               {/* User Settings (non-admin) */}
               <Route path="commission-plan" element={suspense(<DashboardCommissionPlan />, "Loading...")} />
               <Route path="profile" element={suspense(<DashboardProfile />, "Loading...")} />
               <Route path="tpin" element={suspense(<DashboardTpin />, "Loading...")} />
               <Route path="change-password" element={suspense(<DashboardChangePassword />, "Loading...")} />
               <Route path="certificate" element={suspense(<DashboardCertificate />, "Loading...")} />
-              <Route path="device-driver" element={suspense(<DashboardDeviceDriver />, "Loading...")} />
               <Route path="support" element={suspense(<DashboardSupport />, "Loading...")} />
             </Route>
             <Route path="*" element={suspense(<NotFound />, "Loading...")} />
@@ -148,6 +158,7 @@ const App = () => (
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

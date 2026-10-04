@@ -2,6 +2,7 @@ import { Router } from "express";
 import { prisma } from "../index";
 import { requireAuth, AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/permissions";
+import { logSystemActivity } from "./systemLogs";
 
 const router = Router();
 
@@ -82,6 +83,14 @@ router.post("/", requireAuth, async (req: AuthRequest, res) => {
       });
     }
 
+    await logSystemActivity({
+      userId: req.userId!,
+      action: "FUND_REQUEST_SUBMITTED",
+      module: "WALLET",
+      severity: "info",
+      details: { requestId: request.id, amount: Number(amount), paymentMode: payment_mode, paymentReference: payment_reference },
+    });
+
     res.json(request);
   } catch (e: any) {
     res.status(500).json({ error: e.message });
@@ -129,6 +138,14 @@ router.patch("/:id/approve", requireAuth, requirePermission("canApproveFundReque
       },
     });
 
+    await logSystemActivity({
+      userId: req.userId!,
+      action: "FUND_REQUEST_APPROVED",
+      module: "WALLET",
+      severity: "info",
+      details: { requestId: req.params.id, requesterId: fundReq.requesterId, amount: Number(fundReq.amount) },
+    });
+
     res.json({ success: true, txnId: txn.id, request: updatedReq });
   } catch (e: any) {
     res.status(500).json({ error: e.message });
@@ -151,6 +168,14 @@ router.patch("/:id/reject", requireAuth, requirePermission("canRejectFundRequest
         message: `Your fund request of ₹${fundReq.amount} was rejected. Reason: ${reason || "Not specified"}`,
         type: "error",
       },
+    });
+
+    await logSystemActivity({
+      userId: req.userId!,
+      action: "FUND_REQUEST_REJECTED",
+      module: "WALLET",
+      severity: "warning",
+      details: { requestId: req.params.id, requesterId: fundReq.requesterId, amount: Number(fundReq.amount), reason },
     });
 
     res.json({ success: true });

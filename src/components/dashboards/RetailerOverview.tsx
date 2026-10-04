@@ -10,12 +10,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+  AreaChart, Area, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiFetch } from "@/services/api";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const PIE_COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))"];
 
@@ -45,25 +47,33 @@ const allServices = [
 
 export default function RetailerOverview({ name }: { name: string }) {
   const { walletBalance, eWalletBalance } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
   const [stats, setStats] = useState({
     earningsToday: 0,
     transactionsToday: 0,
     recentTransactions: [] as any[],
   });
+  const [activeServices, setActiveServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchStatsAndServices = async () => {
       try {
-        const data = await apiFetch("/stats/retailer");
-        setStats(data);
+        const [statsData, servicesData] = await Promise.all([
+          apiFetch("/stats/retailer").catch(() => null),
+          apiFetch("/users/services").catch(() => [])
+        ]);
+        if (statsData) setStats(statsData);
+        if (servicesData) setActiveServices(servicesData);
       } catch (err) {
-        console.error("Error fetching retailer stats:", err);
+        console.error("Error fetching retailer stats/services:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchStats();
+    fetchStatsAndServices();
   }, []);
 
   const statCards = [
@@ -100,16 +110,40 @@ export default function RetailerOverview({ name }: { name: string }) {
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-4 sm:gap-6">
-            {allServices.map((svc) => (
-              <Link key={svc.label} to={svc.path}>
-                <div className="flex flex-col items-center gap-2 p-3 rounded-xl border border-border hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer group">
+            {allServices.map((svc) => {
+              // Note: activeServices from API usually uses camelCase (e.g., serviceKey: "aeps") or snake_case
+              // svc.path like "/dashboard/aeps" -> service key can be inferred by removing "/dashboard/"
+              // Or just match by path.
+              const serviceKey = svc.path.replace("/dashboard/", "");
+              
+              const isEnabled = activeServices.some((active) => 
+                active.serviceKey === serviceKey || 
+                active.service_key === serviceKey ||
+                (active.routePath && active.routePath === svc.path)
+              );
+
+              const handleServiceClick = () => {
+                if (isEnabled) {
+                  navigate(svc.path);
+                } else {
+                  toast({
+                    title: "Service Not Enabled",
+                    description: "This service is not enabled for your account. Please contact support to get it.",
+                    variant: "destructive",
+                  });
+                  navigate("/dashboard/support");
+                }
+              };
+
+              return (
+                <div key={svc.label} onClick={handleServiceClick} className="flex flex-col items-center gap-2 p-3 rounded-xl border border-border hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer group">
                   <div className={`w-11 h-11 rounded-xl ${svc.bg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
                     <svc.icon className={`w-5 h-5 ${svc.color}`} />
                   </div>
                   <span className="text-[11px] font-medium text-foreground text-center leading-tight">{svc.label}</span>
                 </div>
-              </Link>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </Card>
@@ -178,23 +212,7 @@ export default function RetailerOverview({ name }: { name: string }) {
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-base font-heading">Service Usage Breakdown</CardTitle></CardHeader>
-          <CardContent>
-            <div className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={[]} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
-                    {[].map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} formatter={(v: number) => [`${v}%`]} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
+      <div className="grid gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-heading flex items-center gap-2">

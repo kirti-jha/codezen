@@ -21,48 +21,77 @@ function generateSignature() {
 }
 
 async function ipPost(endpoint: string, body: Record<string, unknown>) {
-  const url = `${INSTANTPAY_BASE}${endpoint}`;
-  const { timestamp, signature } = generateSignature();
+  console.log(`[MOCK InstantPay Request] POST ${endpoint}`);
+  console.log(`[MOCK InstantPay Payload] ${JSON.stringify(body, null, 2)}`);
   
-  console.log(`[InstantPay API Request] POST ${url}`);
-  console.log(`[InstantPay API Payload] ${JSON.stringify(body, null, 2)}`);
-  
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": API_KEY,
-      "x-client-id": CLIENT_ID,
-      "x-timestamp": timestamp,
-      "x-signature": signature,
-    },
-    body: JSON.stringify(body),
-  });
+  // Simulate network delay
+  await new Promise(r => setTimeout(r, 800));
 
-  const result = (await res.json()) as any;
-  console.log(`[InstantPay API Response] ${JSON.stringify(result, null, 2)}`);
+  const result = {
+    status: "SUCCESS",
+    statusCode: "SUCCESS",
+    statuscode: "SUCCESS",
+    response_code: "SUCCESS",
+    code: 200,
+    txnId: `MOCK_TXN_${Date.now()}`,
+    refId: `MOCK_REF_${Date.now()}`,
+    clientRefId: body.clientRefId || `MOCK_CREF_${Date.now()}`,
+    balance: "10000.00",
+    message: "Transaction successful (MOCK)",
+    data: {
+      txnId: `MOCK_TXN_${Date.now()}`,
+      balance: "10000.00",
+    }
+  };
+  
+  console.log(`[MOCK InstantPay Response] ${JSON.stringify(result, null, 2)}`);
   return result;
 }
 
 async function ipGet(endpoint: string) {
-  const url = `${INSTANTPAY_BASE}${endpoint}`;
-  const { timestamp, signature } = generateSignature();
+  console.log(`[MOCK InstantPay Request] GET ${endpoint}`);
+  await new Promise(r => setTimeout(r, 300));
+  
+  // Mock simple list responses
+  let data = [];
+  if (endpoint.includes("bank-list")) {
+    data = [
+      { iin: "123456", name: "Mock State Bank" },
+      { iin: "654321", name: "Mock HDFC Bank" },
+    ];
+  } else if (endpoint.includes("billers")) {
+    data = [
+      { billerId: "AIRP00000NAT01", billerName: "Airtel" },
+      { billerId: "JIOP00000NAT01", billerName: "Jio" },
+    ];
+  }
 
-  console.log(`[InstantPay API Request] GET ${url}`);
+  const result = {
+    status: "SUCCESS",
+    statusCode: "SUCCESS",
+    code: 200,
+    data
+  };
 
-  const res = await fetch(url, {
-    method: "GET",
-    headers: { 
-      "x-api-key": API_KEY, 
-      "x-client-id": CLIENT_ID,
-      "x-timestamp": timestamp,
-      "x-signature": signature,
-    },
-  });
-
-  const result = (await res.json()) as any;
-  console.log(`[InstantPay API Response] ${JSON.stringify(result, null, 2)}`);
+  console.log(`[MOCK InstantPay Response] ${JSON.stringify(result, null, 2)}`);
   return result;
+}
+async function checkDuplicateTransaction(userId: string, amount: number, target: string) {
+  const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000);
+  const duplicate = await prisma.transaction.findFirst({
+    where: {
+      userId,
+      amount,
+      createdAt: { gte: fiveMinsAgo },
+      OR: [
+        { beneficiary: { equals: target } },
+        { consumer: { equals: target } }
+      ]
+    }
+  });
+  if (duplicate) {
+    throw new Error("Duplicate transaction: Please wait 5 minutes before repeating the same transaction for this user/target.");
+  }
 }
 
 // Robust helper to check for success across different InstantPay API formats
@@ -237,6 +266,9 @@ router.post("/remittance/transaction", requireAuth, async (req: AuthRequest, res
       return res.status(400).json({ error: "Insufficient balance" });
     }
 
+    const beneficiary = req.body.beneficiary_name || req.body.beneficiary_id || "";
+    if (beneficiary) await checkDuplicateTransaction(req.userId!, amount, beneficiary);
+
     const result = await ipPost("/v1/remittance/transaction", {
       ...req.body,
       clientRefId: `RMT_${Date.now()}_${req.userId?.slice(0, 6)}`,
@@ -273,6 +305,9 @@ router.post("/bbps/pay-bill", requireAuth, async (req: AuthRequest, res) => {
     if (!wallet || Number(wallet.balance) < amount) {
       return res.status(400).json({ error: "Insufficient balance" });
     }
+
+    const consumer = req.body.consumerNumber || req.body.billerId || "";
+    if (consumer) await checkDuplicateTransaction(req.userId!, amount, consumer);
 
     const result = await ipPost("/v1/bbps/pay-bill", {
       ...req.body,
@@ -363,6 +398,9 @@ router.post("/payout/bank-accounts", requireAuth, async (req: AuthRequest, res) 
       return res.status(400).json({ error: "Insufficient balance" });
     }
 
+    const beneficiary = req.body.beneficiary_name || req.body.account_number || "";
+    if (beneficiary) await checkDuplicateTransaction(req.userId!, amount, beneficiary);
+
     const result = await ipPost("/v1/payouts/bank-accounts", {
       ...req.body,
       clientRefId: `PYT_${Date.now()}_${req.userId?.slice(0, 6)}`,
@@ -386,6 +424,9 @@ router.post("/payout/upi-vpa", requireAuth, async (req: AuthRequest, res) => {
     if (!wallet || Number(wallet.balance) < amount) {
       return res.status(400).json({ error: "Insufficient balance" });
     }
+
+    const beneficiary = req.body.beneficiary_name || req.body.vpa || "";
+    if (beneficiary) await checkDuplicateTransaction(req.userId!, amount, beneficiary);
 
     const result = await ipPost("/v1/payouts/upi-vpa", {
       ...req.body,

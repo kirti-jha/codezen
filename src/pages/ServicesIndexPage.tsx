@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import usePageTitle from "@/hooks/usePageTitle";
 
 export default function ServicesIndexPage() {
-  usePageTitle("AbheePay | Services");
+  usePageTitle("GenPay | Services");
 
   return (
     <div className="min-h-screen bg-gradient-hero">

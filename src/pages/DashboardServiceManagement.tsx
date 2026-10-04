@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import {
-  Settings2, ToggleLeft, ToggleRight, RefreshCw, Search,
+  Settings2, ToggleLeft, ToggleRight, RefreshCw, Search, AlertTriangle, CheckCircle2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiFetch } from "@/services/api";
 
@@ -25,8 +25,16 @@ export default function DashboardServiceManagement() {
   const [toggling, setToggling] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
-  const fetchServices = useCallback(async () => {
-    setLoading(true);
+  // Confirmation Modal state
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [pendingService, setPendingService] = useState<ServiceConfig | null>(null);
+
+  // Success / Done Modal state
+  const [doneModalOpen, setDoneModalOpen] = useState(false);
+  const [doneMessage, setDoneMessage] = useState("");
+
+  const fetchServices = useCallback(async (isInitial = false) => {
+    if (isInitial) setLoading(true);
     try {
       const data = await apiFetch("/service-config");
       if (data) {
@@ -41,30 +49,54 @@ export default function DashboardServiceManagement() {
       }
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      if (isInitial) setLoading(false);
     }
-    setLoading(false);
   }, [toast]);
 
-  useEffect(() => { fetchServices(); }, [fetchServices]);
+  useEffect(() => { fetchServices(true); }, [fetchServices]);
 
-  const toggleService = async (service: ServiceConfig) => {
+  // Step 1: Open Confirmation Modal when toggle is clicked
+  const handleToggleClick = (service: ServiceConfig) => {
+    setPendingService(service);
+    setConfirmModalOpen(true);
+  };
+
+  // Step 2: Confirm action and execute backend toggle
+  const executeToggleService = async () => {
+    if (!pendingService) return;
+    const service = pendingService;
+    const newStatus = !service.is_enabled;
+
     setToggling(service.service_key);
+    setConfirmModalOpen(false); // Close confirm modal
+
+    // Optimistic Update
+    setServices((prev) =>
+      prev.map((s) => (s.id === service.id ? { ...s, is_enabled: newStatus } : s))
+    );
+
     try {
       await apiFetch(`/service-config/${service.id}`, {
         method: "PATCH",
-        body: JSON.stringify({ is_enabled: !service.is_enabled }),
+        body: JSON.stringify({ is_enabled: newStatus }),
       });
-      toast({
-        title: `${service.service_label} ${!service.is_enabled ? "enabled" : "disabled"}`,
-        description: !service.is_enabled
-          ? "Service is now visible to all users."
-          : "Service is now hidden from all users globally.",
-      });
-      fetchServices();
+
+      const msg = `"${service.service_label}" service has been successfully ${newStatus ? "ENABLED" : "DISABLED"} globally for all users.`;
+      setDoneMessage(msg);
+      setDoneModalOpen(true); // Open Done modal
+
+      window.dispatchEvent(new Event("genpay_services_updated"));
+      fetchServices(false); // Silent sync
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      // Revert on failure
+      setServices((prev) =>
+        prev.map((s) => (s.id === service.id ? { ...s, is_enabled: service.is_enabled } : s))
+      );
+      toast({ title: "Toggle Failed", description: err.message, variant: "destructive" });
     } finally {
       setToggling(null);
+      setPendingService(null);
     }
   };
 
@@ -77,7 +109,7 @@ export default function DashboardServiceManagement() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-heading font-bold text-foreground">Service Management</h1>
@@ -85,7 +117,7 @@ export default function DashboardServiceManagement() {
             Globally enable or disable services across the entire platform.
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchServices}>
+        <Button variant="outline" size="sm" onClick={() => fetchServices(false)}>
           <RefreshCw className="w-4 h-4 mr-1" /> Refresh
         </Button>
       </div>
@@ -130,7 +162,7 @@ export default function DashboardServiceManagement() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => toggleService(s)}
+                    onClick={() => handleToggleClick(s)}
                     disabled={toggling === s.service_key}
                     className={s.is_enabled ? "text-success hover:text-success" : "text-destructive hover:text-destructive"}
                   >
@@ -154,8 +186,68 @@ export default function DashboardServiceManagement() {
 
       <div className="p-4 rounded-xl border border-dashed border-warning/40 bg-warning/5 text-xs text-muted-foreground">
         <Settings2 className="w-4 h-4 text-warning inline mr-1.5" />
-        <strong>Note:</strong> Disabling a service here hides it from <em>all</em> users globally. To disable for a specific user, go to User Management → user actions → Manage Services.
+        <strong>Note:</strong> Disabling a service here hides it from <em>all</em> users globally.
       </div>
+
+      {/* MODAL 1: Confirmation Popup */}
+      {pendingService && (
+        <Dialog open={confirmModalOpen} onOpenChange={setConfirmModalOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-xl font-bold text-amber-600">
+                <AlertTriangle className="w-6 h-6 text-amber-500" />
+                Confirm Service Status Change
+              </DialogTitle>
+              <DialogDescription className="pt-2 text-sm text-foreground">
+                Are you sure you want to <strong>{pendingService.is_enabled ? "DISABLE" : "ENABLE"}</strong> the service{" "}
+                <span className="font-bold text-primary">"{pendingService.service_label}"</span>?
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="p-3 bg-muted/40 rounded-lg text-xs text-muted-foreground border border-border">
+              {pendingService.is_enabled
+                ? "This will hide the service globally from all distributors, retailers, and users."
+                : "This will restore and make the service visible platform-wide."}
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0 mt-2">
+              <Button type="button" variant="outline" onClick={() => setConfirmModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant={pendingService.is_enabled ? "destructive" : "default"}
+                onClick={executeToggleService}
+              >
+                Yes, {pendingService.is_enabled ? "Disable Service" : "Enable Service"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* MODAL 2: Done / Success Popup */}
+      <Dialog open={doneModalOpen} onOpenChange={setDoneModalOpen}>
+        <DialogContent className="sm:max-w-md text-center">
+          <div className="flex flex-col items-center justify-center pt-4">
+            <div className="w-14 h-14 rounded-full bg-emerald-500/15 flex items-center justify-center mb-3">
+              <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+            </div>
+            <DialogTitle className="text-xl font-extrabold text-foreground">
+              Action Completed!
+            </DialogTitle>
+            <DialogDescription className="mt-2 text-sm text-muted-foreground font-medium">
+              {doneMessage}
+            </DialogDescription>
+          </div>
+
+          <DialogFooter className="sm:justify-center mt-4">
+            <Button type="button" className="px-8 font-bold" onClick={() => setDoneModalOpen(false)}>
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

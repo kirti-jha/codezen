@@ -9,7 +9,7 @@ export default function BlogDetailPage() {
 
   if (!post) return <Navigate to="/blogs" replace />;
 
-  usePageTitle(`AbheePay | ${post.title}`);
+  usePageTitle(`GenPay | ${post.title}`);
 
   const related = getRelatedBlogPosts(post);
 
@@ -18,11 +18,7 @@ export default function BlogDetailPage() {
       <div className="container mx-auto px-4 pt-28 pb-16">
         <div className="flex items-center justify-between gap-4">
           <Link to="/" className="inline-flex items-center">
-            <img
-              src="https://pos.abheepay.com/assets/FORMAT-PNG-Lj3U1uY2.png"
-              alt="ABHEEPAY"
-              className="h-12 w-auto"
-            />
+            <span className="font-extrabold text-2xl tracking-tight text-primary">GenPay</span>
           </Link>
           <div className="flex items-center gap-3">
             <Link to="/blogs">

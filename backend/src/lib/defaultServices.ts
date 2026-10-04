@@ -24,4 +24,5 @@ export const DEFAULT_SERVICES: DefaultServiceConfig[] = [
   { serviceKey: "travel_package", serviceLabel: "Travel Pkg", routePath: "/dashboard/travel-package", icon: "Globe" },
   { serviceKey: "pg", serviceLabel: "PG", routePath: "/dashboard/pg", icon: "Shield" },
   { serviceKey: "bank_account", serviceLabel: "Bank A/C", routePath: "/dashboard/bank-account", icon: "Landmark" },
+  { serviceKey: "upi_qr", serviceLabel: "UPI QR", routePath: "/dashboard/upi-qr", icon: "QrCode" },
 ];

@@ -3,18 +3,14 @@ import { Button } from "@/components/ui/button";
 import usePageTitle from "@/hooks/usePageTitle";
 
 export default function RefundPolicyPage() {
-  usePageTitle("AbheePay | Refund Policy");
+  usePageTitle("GenPay | Refund Policy");
 
   return (
     <div className="min-h-screen bg-gradient-hero">
       <div className="container mx-auto px-4 pt-28 pb-16">
         <div className="flex items-center justify-between gap-4">
           <Link to="/" className="inline-flex items-center">
-            <img
-              src="https://pos.abheepay.com/assets/FORMAT-PNG-Lj3U1uY2.png"
-              alt="ABHEEPAY"
-              className="h-12 w-auto"
-            />
+            <span className="font-extrabold text-2xl tracking-tight text-primary">GenPay</span>
           </Link>
           <div className="flex items-center gap-3">
             <Link to="/services">
@@ -36,7 +32,7 @@ export default function RefundPolicyPage() {
 
           <div className="mt-8 rounded-2xl border border-border bg-gradient-card p-8 shadow-elevated">
             <p className="text-muted-foreground leading-relaxed">
-              This Refund Policy governs the use of services provided by AbheePay, including POS services, MATM,
+              This Refund Policy governs the use of services provided by GenPay, including POS services, MATM,
               BBPS, recharge services, loan distribution, credit card services, and other financial products.
               By using our services, you agree to this Refund Policy.
             </p>
@@ -46,9 +42,9 @@ export default function RefundPolicyPage() {
                 <div className="font-heading font-bold text-foreground">1. Digital Payment Transactions (POS / Collect)</div>
                 <ul className="mt-3 list-disc pl-5 space-y-2 text-sm text-muted-foreground">
                   <li>All payment transactions are processed instantly through banking networks.</li>
-                  <li>Once a transaction is successfully completed, it cannot be reversed by AbheePay.</li>
+                  <li>Once a transaction is successfully completed, it cannot be reversed by GenPay.</li>
                   <li>In case of wrong payment made by a customer, the customer must contact their bank directly.</li>
-                  <li>AbheePay is not responsible for incorrect payments made due to customer error.</li>
+                  <li>GenPay is not responsible for incorrect payments made due to customer error.</li>
                 </ul>
               </li>
 
@@ -59,7 +55,7 @@ export default function RefundPolicyPage() {
                   <li>The amount is generally auto-reversed by the bank.</li>
                   <li>Refund timeline is usually 3–7 working days (depending on bank policy).</li>
                   <li>If refund is delayed beyond this period, users should contact their respective bank first.</li>
-                  <li>AbheePay support can assist by providing transaction reference details.</li>
+                  <li>GenPay support can assist by providing transaction reference details.</li>
                 </ul>
               </li>
 
@@ -68,7 +64,7 @@ export default function RefundPolicyPage() {
                 <ul className="mt-3 list-disc pl-5 space-y-2 text-sm text-muted-foreground">
                   <li>Cash withdrawal and banking transactions once successfully processed cannot be refunded.</li>
                   <li>In case of failed transactions with debit, refund will be processed by the bank within standard settlement timelines.</li>
-                  <li>AbheePay is not responsible for delays caused by banking partners.</li>
+                  <li>GenPay is not responsible for delays caused by banking partners.</li>
                 </ul>
               </li>
 
@@ -100,13 +96,13 @@ export default function RefundPolicyPage() {
               <li>
                 <div className="font-heading font-bold text-foreground">6. Loan &amp; Credit Card Services</div>
                 <div className="mt-3 text-sm text-muted-foreground">
-                  AbheePay acts as a referral or distribution partner for banks/NBFCs.
+                  GenPay acts as a referral or distribution partner for banks/NBFCs.
                 </div>
                 <ul className="mt-2 list-disc pl-5 space-y-2 text-sm text-muted-foreground">
                   <li>Loan processing fees charged by lending partners are non-refundable.</li>
                   <li>Loan approval and disbursal are subject to partner policies.</li>
                   <li>Credit card issuance and related charges are governed by the issuing bank.</li>
-                  <li>AbheePay does not guarantee loan approval.</li>
+                  <li>GenPay does not guarantee loan approval.</li>
                 </ul>
               </li>
 
@@ -115,7 +111,7 @@ export default function RefundPolicyPage() {
                 <ul className="mt-3 list-disc pl-5 space-y-2 text-sm text-muted-foreground">
                   <li>Insurance premium refunds depend on the cancellation policy of the respective insurance company.</li>
                   <li>Free-look period (if applicable) will be governed by insurer terms.</li>
-                  <li>AbheePay is not responsible for insurer claim decisions.</li>
+                  <li>GenPay is not responsible for insurer claim decisions.</li>
                 </ul>
               </li>
 
@@ -123,7 +119,7 @@ export default function RefundPolicyPage() {
                 <div className="font-heading font-bold text-foreground">8. Service Charges &amp; Subscription Fees</div>
                 <div className="mt-3 text-sm text-muted-foreground">
                   Activation fees, platform fees, processing fees, and subscription charges are non-refundable unless there is
-                  a verified technical error from AbheePay’s side.
+                  a verified technical error from GenPay’s side.
                 </div>
               </li>
 
@@ -149,7 +145,7 @@ export default function RefundPolicyPage() {
               <li>
                 <div className="font-heading font-bold text-foreground">11. Policy Updates</div>
                 <div className="mt-3 text-sm text-muted-foreground">
-                  AbheePay reserves the right to modify this Refund Policy at any time. Updated policies will be published on this page.
+                  GenPay reserves the right to modify this Refund Policy at any time. Updated policies will be published on this page.
                 </div>
               </li>
             </ol>
@@ -158,8 +154,8 @@ export default function RefundPolicyPage() {
               <div className="font-heading font-bold text-foreground">Need help?</div>
               <div className="mt-2 text-sm text-muted-foreground">
                 Contact support at{" "}
-                <a className="text-foreground font-medium hover:underline" href="mailto:care@abheepay.in">
-                  care@abheepay.in
+                <a className="text-foreground font-medium hover:underline" href="mailto:care@genpay.in">
+                  care@genpay.in
                 </a>{" "}
                 or call{" "}
                 <a className="text-foreground font-medium hover:underline" href="tel:+918860037218">

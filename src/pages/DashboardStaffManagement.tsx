@@ -15,7 +15,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { apiFetch } from "@/services/api";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { getRoles } from "./DashboardRoleTemplates";
 
 interface PermissionGroup {
   title: string;
@@ -28,7 +30,7 @@ interface PermissionGroup {
   }[];
 }
 
-const PERMISSION_GROUPS: PermissionGroup[] = [
+export const PERMISSION_GROUPS: PermissionGroup[] = [
   {
     title: "User Management",
     masterKey: "can_manage_users",
@@ -83,6 +85,31 @@ const PERMISSION_GROUPS: PermissionGroup[] = [
       { key: "can_view_reports", label: "View Reports", description: "Allow accessing analytical reports" },
     ],
   },
+  {
+    title: "Financial Services (B2B/B2C)",
+    masterKey: "can_manage_fin_services",
+    icon: Wallet,
+    permissions: [
+      { key: "can_manage_aeps_matm", label: "AEPS & MATM", description: "Manage AEPS and Micro ATM services" },
+      { key: "can_manage_bbps_recharge", label: "BBPS & Recharge", description: "Manage Bill Payments and Recharges" },
+      { key: "can_manage_payouts", label: "Payouts & Remittance", description: "Manage Money Transfers and Payouts" },
+      { key: "can_manage_upi_qr", label: "UPI & QR", description: "Manage UPI Collections and QR Portal" },
+      { key: "can_manage_cc_bill", label: "Credit Card Bill Pay", description: "Manage Credit Card Bill Payments" },
+      { key: "can_manage_loan_ins", label: "Loan & Insurance", description: "Manage Loan EMI and Insurance services" },
+      { key: "can_manage_pg", label: "Payment Gateway", description: "Manage Payment Gateway integrations" },
+    ],
+  },
+  {
+    title: "Value Added Services",
+    masterKey: "can_manage_vas",
+    icon: Settings,
+    permissions: [
+      { key: "can_manage_travel", label: "Travel Services", description: "Manage Travel Bookings and Packages" },
+      { key: "can_manage_pos", label: "POS & Hardware", description: "Manage POS Devices and SoundBox" },
+      { key: "can_manage_certificates", label: "Certificates", description: "Manage Retailer/Distributor Certificates" },
+      { key: "can_manage_ppi", label: "PPI Wallet", description: "Manage PPI Wallet services" },
+    ],
+  },
 ];
 
 const INITIAL_PERMS: Record<string, boolean> = {
@@ -109,6 +136,19 @@ const INITIAL_PERMS: Record<string, boolean> = {
   can_manage_security: false,
   can_reply_support_tickets: true,
   can_view_reports: true,
+  can_manage_fin_services: false,
+  can_manage_aeps_matm: false,
+  can_manage_bbps_recharge: false,
+  can_manage_payouts: false,
+  can_manage_upi_qr: false,
+  can_manage_cc_bill: false,
+  can_manage_loan_ins: false,
+  can_manage_pg: false,
+  can_manage_vas: false,
+  can_manage_travel: false,
+  can_manage_pos: false,
+  can_manage_certificates: false,
+  can_manage_ppi: false,
 };
 
 interface StaffAdmin {
@@ -130,7 +170,17 @@ export default function DashboardStaffManagement() {
   const [formName, setFormName] = useState("");
   const [formPhone, setFormPhone] = useState("");
   const [formPerms, setFormPerms] = useState<Record<string, boolean>>(INITIAL_PERMS);
+  const [selectedRole, setSelectedRole] = useState("");
   const [creating, setCreating] = useState(false);
+
+  const applyRole = (roleName: string, isEdit: boolean) => {
+    if (isEdit) return; // For now only apply on create
+    setSelectedRole(roleName);
+    const role = getRoles().find((r: any) => r.name === roleName);
+    if (role) {
+      setFormPerms({ ...INITIAL_PERMS, ...role.perms });
+    }
+  };
 
   const [editOpen, setEditOpen] = useState(false);
   const [editAdmin, setEditAdmin] = useState<StaffAdmin | null>(null);
@@ -359,9 +409,21 @@ export default function DashboardStaffManagement() {
               </div>
 
               <div className="space-y-4">
-                <Label className="text-sm font-bold flex items-center gap-2 border-b pb-2">
-                  <ShieldCheck className="w-4 h-4 text-primary" /> Permissions & Access Control
-                </Label>
+                <div className="flex items-center justify-between border-b pb-2">
+                  <Label className="text-sm font-bold flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-primary" /> Permissions & Access Control
+                  </Label>
+                  <Select value={selectedRole} onValueChange={(val) => applyRole(val, false)}>
+                    <SelectTrigger className="w-[180px] h-8 text-xs">
+                      <SelectValue placeholder="Select Predefined Role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getRoles().map((r: any) => (
+                        <SelectItem key={r.name} value={r.name}>{r.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="space-y-4 pb-4">
                   {PERMISSION_GROUPS.map((group) => {
                     const isMasterActive = !!formPerms[group.masterKey];

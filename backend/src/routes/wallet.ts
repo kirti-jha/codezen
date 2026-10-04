@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../index";
 import { requireAuth, AuthRequest } from "../middleware/auth";
+import { logSystemActivity } from "./systemLogs";
 
 const router = Router();
 
@@ -70,6 +71,14 @@ router.post("/top-up", requireAuth, async (req: AuthRequest, res) => {
       },
     });
 
+    await logSystemActivity({
+      userId: req.userId!,
+      action: "ADMIN_WALLET_TOPUP",
+      module: "WALLET",
+      severity: "info",
+      details: { targetUserId: to_user_id, amount: amt, description },
+    });
+
     res.json(txn);
   } catch (e: any) {
     res.status(500).json({ error: e.message });
@@ -83,6 +92,18 @@ router.post("/transfer", requireAuth, async (req: AuthRequest, res) => {
   if (!amt || amt <= 0) return res.status(400).json({ error: "Amount must be greater than zero" });
 
   try {
+    // Duplicate transaction check (same sender, same receiver, same amount within 5 mins)
+    const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const recentTx = await prisma.walletTransaction.findFirst({
+      where: {
+        fromUserId: req.userId!,
+        toUserId: to_user_id,
+        amount: amt,
+        createdAt: { gte: fiveMinsAgo }
+      }
+    });
+    if (recentTx) return res.status(429).json({ error: "Duplicate transaction: Please wait 5 minutes before repeating the same transfer." });
+
     const fromWallet = await prisma.wallet.findUnique({ where: { userId: req.userId! } });
     if (!fromWallet || Number(fromWallet.balance) < amt) {
       return res.status(400).json({ error: "Insufficient balance" });
@@ -118,6 +139,14 @@ router.post("/transfer", requireAuth, async (req: AuthRequest, res) => {
         message: `You received ₹${amt} from your upline.`,
         type: "success",
       },
+    });
+
+    await logSystemActivity({
+      userId: req.userId!,
+      action: "WALLET_FUND_TRANSFER",
+      module: "WALLET",
+      severity: "info",
+      details: { targetUserId: to_user_id, amount: amt, description },
     });
 
     res.json(txn);

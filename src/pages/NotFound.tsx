@@ -4,7 +4,7 @@ import usePageTitle from "@/hooks/usePageTitle";
 
 const NotFound = () => {
   const location = useLocation();
-  usePageTitle("AbheePay | 404");
+  usePageTitle("GenPay | 404");
 
   useEffect(() => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);

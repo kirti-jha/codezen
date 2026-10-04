@@ -4,7 +4,7 @@ import { ABOUT_ABHEEPAY } from "@/data/about";
 import usePageTitle from "@/hooks/usePageTitle";
 
 export default function AboutPage() {
-  usePageTitle("AbheePay | About Us");
+  usePageTitle("GenPay | About Us");
 
   const { coreValues, highlights, missionVision, paragraphs, stats, subheading } = ABOUT_ABHEEPAY;
 
@@ -13,11 +13,7 @@ export default function AboutPage() {
       <div className="container mx-auto px-4 pt-28 pb-16">
         <div className="flex items-center justify-between gap-4">
           <Link to="/" className="inline-flex items-center">
-            <img
-              src="https://pos.abheepay.com/assets/FORMAT-PNG-Lj3U1uY2.png"
-              alt="ABHEEPAY"
-              className="h-12 w-auto"
-            />
+            <span className="font-extrabold text-2xl tracking-tight text-primary">GenPay</span>
           </Link>
           <div className="flex items-center gap-3">
             <Link to="/services">
@@ -31,7 +27,7 @@ export default function AboutPage() {
 
         <div className="mt-10 mx-auto max-w-6xl">
           <h1 className="text-4xl sm:text-5xl font-heading font-bold text-foreground">
-            About <span className="text-gradient-primary">AbheePay</span>
+            About <span className="text-gradient-primary">GenPay</span>
           </h1>
           <p className="text-muted-foreground mt-4 leading-relaxed max-w-3xl">
             {subheading}

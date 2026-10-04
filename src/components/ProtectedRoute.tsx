@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { getAuthToken } from "@/services/api";
 import type { AppRole } from "@/types/auth";
 
 const ROLE_HIERARCHY: Record<AppRole, number> = {
@@ -18,8 +19,10 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children, allowedRoles, minRole }: ProtectedRouteProps) {
   const { session, role, loading } = useAuth();
+  const token = getAuthToken();
 
-  if (loading) {
+  // If loading, or if valid token exists in storage but AuthContext session/role state is still populating:
+  if (loading || (token && (!session || !role))) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -27,19 +30,8 @@ export default function ProtectedRoute({ children, allowedRoles, minRole }: Prot
     );
   }
 
-  if (!session) {
+  if (!token || !session || !role) {
     return <Navigate to="/login" replace />;
-  }
-
-  if (!role) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-3">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-muted-foreground text-sm">Loading your role...</p>
-        </div>
-      </div>
-    );
   }
 
   if (allowedRoles && !allowedRoles.includes(role)) {

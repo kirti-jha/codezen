@@ -9,7 +9,7 @@ import { apiFetch } from "@/services/api";
 import usePageTitle from "@/hooks/usePageTitle";
 
 export default function BootstrapAdminPage() {
-  usePageTitle("AbheePay | Bootstrap Admin");
+  usePageTitle("GenPay | Bootstrap Admin");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +25,7 @@ export default function BootstrapAdminPage() {
     try {
       const res = await apiFetch("/auth/bootstrap-admin", {
         method: "POST",
-        body: JSON.stringify({ email, password, full_name: fullName, secret: "abheepay-bootstrap-2026" }),
+        body: JSON.stringify({ email, password, full_name: fullName, secret: "genpay-bootstrap-2026" }),
       });
       if (res.error) throw new Error(res.error);
       toast({ title: "Admin created!", description: "You can now log in with these credentials." });
@@ -46,7 +46,7 @@ export default function BootstrapAdminPage() {
             <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
               <Zap className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="font-heading text-2xl font-bold text-foreground">Abheepay</span>
+            <span className="font-heading text-2xl font-bold text-foreground">GenPay</span>
           </Link>
           <p className="text-muted-foreground text-sm">One-time setup: Create the first admin account</p>
         </div>
@@ -62,7 +62,7 @@ export default function BootstrapAdminPage() {
           </div>
           <div className="space-y-2">
             <Label>Email</Label>
-            <Input type="email" placeholder="admin@abheepay.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <Input type="email" placeholder="admin@genpay.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div className="space-y-2">
             <Label>Password</Label>
