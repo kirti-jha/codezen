@@ -17,12 +17,7 @@ const loginDebugDir = path.join(process.cwd(), "logs");
 const loginDebugFile = path.join(loginDebugDir, "login-debug.log");
 
 async function appendLoginDebug(message: string) {
-  try {
-    await fs.promises.mkdir(loginDebugDir, { recursive: true });
-    await fs.promises.appendFile(loginDebugFile, message + "\n", "utf8");
-  } catch (err) {
-    console.error("Failed to write login-debug log", err);
-  }
+  console.log(message);
 }
 
 function buildLoginDebugLine(req: Request, event: string, details: string) {

@@ -53,6 +53,9 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", time: new Date().toISOString() });
 });
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "ok", time: new Date().toISOString() });
+});
 
 // API Routes
 app.use("/api/auth", authRoutes);
