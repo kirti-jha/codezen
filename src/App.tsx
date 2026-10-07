@@ -70,12 +70,16 @@ const DashboardCommissionPlan = lazy(() => import("./pages/DashboardCommissionPl
 const DashboardSupport = lazy(() => import("./pages/DashboardSupport"));
 const DashboardPOSRateSetting = lazy(() => import("./pages/DashboardPOSRateSetting"));
 
+import ErrorBoundary from "@/components/ErrorBoundary";
+
 const queryClient = new QueryClient();
 
 const suspense = (node: React.ReactNode, label?: string) => (
-  <Suspense fallback={<PageLoader label={label} />}>
-    {node}
-  </Suspense>
+  <ErrorBoundary>
+    <Suspense fallback={<PageLoader label={label} />}>
+      {node}
+    </Suspense>
+  </ErrorBoundary>
 );
 
 const App = () => (
@@ -112,6 +116,8 @@ const App = () => (
               <Route path="users" element={<ProtectedRoute minRole="master_distributor">{suspense(<DashboardUsers />, "Loading users...")}</ProtectedRoute>} />
               <Route path="wallet" element={suspense(<DashboardWallet />, "Loading wallet...")} />
               <Route path="fund-requests" element={suspense(<DashboardFundRequests />, "Loading...")} />
+              <Route path="funds" element={suspense(<DashboardFundRequests />, "Loading...")} />
+              <Route path="wallet-funds" element={suspense(<DashboardWallet />, "Loading wallet...")} />
               <Route path="transactions" element={suspense(<DashboardTransactions />, "Loading...")} />
               <Route path="settlements" element={suspense(<DashboardSettlements />, "Loading settlements...")} />
               {/* Services */}

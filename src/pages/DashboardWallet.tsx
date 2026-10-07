@@ -616,7 +616,7 @@ export default function DashboardWallet() {
       <TPinDialog
         open={tpinOpen}
         onOpenChange={setTpinOpen}
-        title="Confirm Wallet Transfer"
+        amount={parseFloat(transferAmount || "0")}
         description={`Transferring ₹${parseFloat(transferAmount || "0").toLocaleString("en-IN")} to selected user.`}
         onSuccess={processTransfer}
       />

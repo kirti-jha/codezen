@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Users, Search, UserPlus, CheckCircle2, XCircle, Clock,
-  MoreVertical, Pencil, ShieldAlert, ShieldCheck, KeyRound, LogIn, Settings2, Upload,
+  MoreVertical, Pencil, Edit, ShieldAlert, ShieldCheck, KeyRound, LogIn, Settings2, Upload,
   Ban, Store, UserCheck, UserX, Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
